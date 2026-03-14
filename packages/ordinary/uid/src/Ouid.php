@@ -11,7 +11,6 @@ use InvalidArgumentException;
 use function preg_match;
 use function sprintf;
 use function str_pad;
-use function substr;
 
 /**
  * Immutable implementation of Ordinary Universal Identifier (OUID).
@@ -98,7 +97,7 @@ final class Ouid implements OuidInterface
      * @param non-empty-string $valueString
      */
     private function __construct(
-        private string $valueString,
+        private readonly string $valueString,
     ) {
         $this->validate($valueString);
     }
@@ -160,23 +159,20 @@ final class Ouid implements OuidInterface
         );
     }
 
-    public function __toString(): string
-    {
-        return $this->valueString;
-    }
-
     /**
      * Validate OUID format.
      *
      * @param non-empty-string $value
      */
-    private function validate(string $value): void
+    private function validate(string $value): array
     {
-        if (preg_match(self::PATTERN, $value) !== 1) {
+        if (preg_match(self::PATTERN, $value, $matches) !== 1) {
             throw new InvalidArgumentException(
                 sprintf('Invalid OUID format: %s', $value),
             );
         }
+
+        return $matches;
     }
 
     /**
@@ -216,18 +212,14 @@ final class Ouid implements OuidInterface
      */
     private function parseOuid(): void
     {
-        if (preg_match(self::PATTERN, $this->valueString, $matches) !== 1) {
-            throw new InvalidArgumentException('Invalid OUID format during parsing');
-        }
-
-        [, $namespace, $secondsEncoded, $microsecondsEncoded, $randomEncoded] = $matches;
+        [, $namespace, $secondsEncoded, $microsecondsEncoded, $randomEncoded] = $this->validate($this->valueString);
 
         $this->cachedNamespace = $namespace;
 
         $seconds = CrockfordBase32::decode($secondsEncoded);
         $microseconds = CrockfordBase32::decode($microsecondsEncoded);
 
-        $this->cachedDatetime = (new DateTimeImmutable('@' . $seconds, new DateTimeZone('UTC')))
+        $this->cachedDatetime = new DateTimeImmutable('@' . $seconds, new DateTimeZone('UTC'))
             ->modify(sprintf('+%d microseconds', $microseconds));
 
         $this->cachedRandomBytes = CrockfordBase32::decodeBytes($randomEncoded, self::RANDOM_BYTES_LENGTH);

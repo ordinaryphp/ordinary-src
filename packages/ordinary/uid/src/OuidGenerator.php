@@ -12,13 +12,13 @@ use Random\Randomizer;
 /**
  * Service for generating new OUIDs.
  */
-final class OuidGenerator
+final readonly class OuidGenerator
 {
-    private readonly Randomizer $randomizer;
+    private Randomizer $randomizer;
 
     public function __construct(
-        private readonly string $namespace,
-        private readonly ClockInterface $clock,
+        private string $namespace,
+        private ClockInterface $clock,
         ?Engine $engine = null,
     ) {
         $this->randomizer = new Randomizer($engine);

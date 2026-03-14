@@ -37,7 +37,6 @@ final class OuidTest extends TestCase
         $ouid = Ouid::fromString($value);
 
         self::assertSame($value, $ouid->value);
-        self::assertSame($value, (string) $ouid);
     }
 
     #[Test]
@@ -122,15 +121,6 @@ final class OuidTest extends TestCase
         $value2 = $ouid->value;
 
         self::assertSame($value1, $value2);
-    }
-
-    #[Test]
-    public function it_converts_to_string(): void
-    {
-        $ouid = Ouid::create('APP', new DateTimeImmutable('now', new DateTimeZone('UTC')), "\x01\x02\x03\x04");
-
-        self::assertSame($ouid->value, $ouid->__toString());
-        self::assertSame($ouid->value, (string) $ouid);
     }
 
     #[Test]

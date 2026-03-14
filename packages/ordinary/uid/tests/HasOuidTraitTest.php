@@ -7,14 +7,13 @@ namespace Ordinary\Uid\Tests;
 use DateTimeImmutable;
 use DateTimeZone;
 use LogicException;
-use Ordinary\Uid\HasOuid;
 use Ordinary\Uid\HasOuidTrait;
 use Ordinary\Uid\Ouid;
-use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversTrait;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(HasOuidTrait::class)]
+#[CoversTrait(HasOuidTrait::class)]
 final class HasOuidTraitTest extends TestCase
 {
     #[Test]

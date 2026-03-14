@@ -6,9 +6,6 @@ use Rector\Config\RectorConfig;
 use Rector\Set\ValueObject\LevelSetList;
 use Rector\Set\ValueObject\SetList;
 use Rector\TypeDeclaration\Rector\StmtsAwareInterface\DeclareStrictTypesRector;
-use Rector\CodeQuality\Rector\ClassMethod\InlineArrayReturnAssignRector;
-use Rector\CodeQuality\Rector\Identical\FlipTypeControlToUseExclusiveTypeRector;
-use Rector\DeadCode\Rector\StaticCall\RemoveParentCallWithoutParentRector;
 
 return RectorConfig::configure()
     ->withPaths([
@@ -30,9 +27,6 @@ return RectorConfig::configure()
     ])
     ->withRules([
         DeclareStrictTypesRector::class,
-        InlineArrayReturnAssignRector::class,
-        FlipTypeControlToUseExclusiveTypeRector::class,
-        RemoveParentCallWithoutParentRector::class,
     ])
     ->withPreparedSets(
         deadCode: true,
@@ -40,6 +34,5 @@ return RectorConfig::configure()
         typeDeclarations: true,
         privatization: true,
         earlyReturn: true,
-        strictBooleans: true,
     )
     ->withImportNames(importShortClasses: false, removeUnusedImports: true);

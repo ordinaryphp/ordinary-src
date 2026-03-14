@@ -65,8 +65,8 @@ final class OuidGeneratorTest extends TestCase
 
     private function createClock(?DateTimeImmutable $fixedTime = null): ClockInterface
     {
-        return new class($fixedTime) implements ClockInterface {
-            public function __construct(private readonly ?DateTimeImmutable $fixedTime = null)
+        return new readonly class($fixedTime) implements ClockInterface {
+            public function __construct(private ?DateTimeImmutable $fixedTime = null)
             {
             }
 
