@@ -8,6 +8,7 @@
     "psr/clock": "^1.0"
   },
   "require-dev": {
+    "ext-xdebug": "*",
     "phpunit/phpunit": "^13.0",
     "friendsofphp/php-cs-fixer": "^3.94",
     "squizlabs/php_codesniffer": "^4.0",

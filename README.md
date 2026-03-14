@@ -52,10 +52,20 @@ vendor/bin/phpmd packages text phpmd.xml
 
 ### Docker Environment
 
-Shell into a PHP 8.5 environment for testing:
+Shell into a PHP 8.5 environment with Composer and Xdebug pre-installed:
 
 ```bash
+# Build the image (first time only)
+docker-compose build
+
+# Start a shell
 docker-compose run --rm php sh
+
+# Inside the container, you can use composer
+composer install
+composer test
+
+# Xdebug is already enabled for debugging and coverage
 ```
 
 ## Contributing
