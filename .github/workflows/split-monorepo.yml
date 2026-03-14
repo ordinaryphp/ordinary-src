@@ -1,0 +1,72 @@
+name: Split Monorepo
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * *' # Daily at midnight
+
+jobs:
+  split:
+    name: Split Packages
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        package:
+          - local_path: 'packages/ordinary/uid'
+            split_repository: 'ordinaryphp/uid'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Extract Version Tag
+        id: extract_tag
+        run: |
+          # Check for version bump labels on the last commit
+          COMMIT_MSG=$(git log -1 --pretty=%B)
+          if echo "$COMMIT_MSG" | grep -q "\[major\]"; then
+            echo "bump=major" >> $GITHUB_OUTPUT
+          elif echo "$COMMIT_MSG" | grep -q "\[minor\]"; then
+            echo "bump=minor" >> $GITHUB_OUTPUT
+          elif echo "$COMMIT_MSG" | grep -q "\[patch\]"; then
+            echo "bump=patch" >> $GITHUB_OUTPUT
+          else
+            echo "bump=none" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Split Repository
+        uses: symplify/monorepo-split-github-action@main
+        with:
+          package_directory: ${{ matrix.package.local_path }}
+          repository_organization: 'ordinaryphp'
+          repository_name: ${{ matrix.package.split_repository }}
+          user_name: "github-actions[bot]"
+          user_email: "github-actions[bot]@users.noreply.github.com"
+          branch: main
+        env:
+          GITHUB_TOKEN: ${{ secrets.SPLIT_REPOSITORY_TOKEN }}
+
+      - name: Create Pull Request in Split Repo
+        if: steps.extract_tag.outputs.bump != 'none'
+        env:
+          GITHUB_TOKEN: ${{ secrets.SPLIT_REPOSITORY_TOKEN }}
+        run: |
+          gh repo clone ordinaryphp/${{ matrix.package.split_repository }} /tmp/${{ matrix.package.split_repository }}
+          cd /tmp/${{ matrix.package.split_repository }}
+
+          # Create version bump PR
+          BRANCH_NAME="version-bump-$(date +%s)"
+          git checkout -b $BRANCH_NAME
+
+          # Update version in composer.json if needed
+          echo "Version bump: ${{ steps.extract_tag.outputs.bump }}"
+
+          git push origin $BRANCH_NAME
+
+          gh pr create \
+            --title "[${{ steps.extract_tag.outputs.bump }}] Sync from monorepo" \
+            --body "Automated sync from main monorepo with version bump: ${{ steps.extract_tag.outputs.bump }}" \
+            --label "version:${{ steps.extract_tag.outputs.bump }}"
