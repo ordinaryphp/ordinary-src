@@ -22,6 +22,9 @@ Thumbs.db
 # Psalm
 psalm-baseline.xml
 
+# PHP CS Fixer
+.php-cs-fixer.cache
+
 # Coverage
 coverage/
 .coverage/

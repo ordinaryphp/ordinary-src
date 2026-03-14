@@ -10,7 +10,7 @@ install: ## Install dependencies
 	composer install
 
 test: ## Run tests
-	vendor/bin/phpunit
+	vendor/bin/phpunit --testdox --coverage-text --coverage-html .coverage
 
 cs-fix: ## Fix code style issues
 	vendor/bin/php-cs-fixer fix
@@ -44,4 +44,4 @@ clean: ## Clean build artifacts
 	find . -name ".phpunit.result.cache" -delete
 
 docker-shell: ## Start a shell in Docker PHP environment
-	docker-compose run --rm php sh
+	docker compose run --rm php sh
