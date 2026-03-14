@@ -17,8 +17,8 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.5'
-          extensions: mbstring, intl, xdebubg
-          coverage: none
+          extensions: mbstring, intl
+          coverage: xdebug
           tools: composer:v2
 
       - name: Get Composer Cache Directory
@@ -51,8 +51,8 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.5'
-          extensions: mbstring, intl, xdebug
-          coverage: none
+          extensions: mbstring, intl
+          coverage: xdebug
           tools: composer:v2
 
       - name: Get Composer Cache Directory
@@ -88,8 +88,8 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.5'
-          extensions: mbstring, intl, xdebug
-          coverage: none
+          extensions: mbstring, intl
+          coverage: xdebug
           tools: composer:v2
 
       - name: Get Composer Cache Directory
@@ -154,8 +154,8 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.5'
-          extensions: mbstring, intl, xdebug
-          coverage: none
+          extensions: mbstring, intl
+          coverage: xdebug
           tools: composer:v2
 
       - name: Check for Security Vulnerabilities
