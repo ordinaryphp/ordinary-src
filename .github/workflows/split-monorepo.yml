@@ -46,7 +46,9 @@ jobs:
           user_name: "github-actions[bot]"
           user_email: "github-actions[bot]@users.noreply.github.com"
           branch: main
-          github_token: ${{ secrets.SPLIT_REPOSITORY_TOKEN }}
+        env:
+          PAT: ${{ secrets.SPLIT_REPOSITORY_TOKEN }}
+          GTIHUB_TOKEN: ${{ secrets.SPLIT_REPOSITORY_TOKEN }}
 
       - name: Create Pull Request in Split Repo
         if: steps.extract_tag.outputs.bump != 'none'
