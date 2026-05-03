@@ -16,7 +16,7 @@ jobs:
       matrix:
         package:
           - local_path: 'packages/ordinary/uid'
-            split_repository: 'ordinaryphp/uid'
+            split_repository: 'uid'
     steps:
       - uses: actions/checkout@v4
         with:
