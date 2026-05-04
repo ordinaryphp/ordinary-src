@@ -15,16 +15,18 @@ parameters:
         booleansInConditions: true
         uselessCast: true
         requireParentConstructorCall: false
-        disallowedConstructs: true
+        disallowedBacktick: true
+        disallowedEmpty: true
+        disallowedImplicitArrayCreation: true
+        disallowedShortTernary: true
         overwriteVariablesWithLoop: true
         closureUsesThis: true
         matchingInheritedMethodNames: true
         numericOperandsInArithmeticOperators: true
-        strictCalls: true
+        strictFunctionCalls: true
+        dynamicCallOnStaticMethod: true
         switchConditionsMatchingType: true
         noVariableVariables: true
-    checkMissingIterableValueType: true
-    checkGenericClassInNonGenericObjectType: true
     checkMissingCallableSignature: true
     checkUninitializedProperties: true
     checkDynamicProperties: true

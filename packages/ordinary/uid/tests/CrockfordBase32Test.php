@@ -122,7 +122,6 @@ final class CrockfordBase32Test extends TestCase
         $encoded = CrockfordBase32::encodeBytes($bytes);
 
         self::assertNotEmpty($encoded);
-        self::assertIsString($encoded);
     }
 
     #[Test]

@@ -11,10 +11,12 @@ namespace Ordinary\Uid;
  */
 trait HasMutableOuidTrait
 {
-    private string $uidValue;
+    /** @var non-empty-string|null */
+    private ?string $uidValue = null;
 
     /**
      * The OUID string value.
+     * @var non-empty-string
      */
     public string $uid {
         get => $this->uidValue ??= Ouid::nil()->value;

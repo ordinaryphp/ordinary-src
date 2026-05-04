@@ -13,16 +13,18 @@ use LogicException;
  */
 trait HasOuidTrait
 {
-    private string $uidValue;
+    /** @var non-empty-string|null */
+    private ?string $uidValue = null;
 
     /**
      * The OUID string value.
+     * @var non-empty-string
      */
     public string $uid {
         get => $this->uidValue ??= Ouid::nil()->value;
 
         set {
-            $current = $this->uidValue ?? null;
+            $current = $this->uidValue;
             $nilValue = Ouid::nil()->value;
 
             if ($current !== null && $current !== $nilValue) {

@@ -16,6 +16,9 @@ final readonly class OuidGenerator
 {
     private Randomizer $randomizer;
 
+    /**
+     * @param non-empty-string $namespace
+     */
     public function __construct(
         private string $namespace,
         private ClockInterface $clock,
@@ -30,6 +33,7 @@ final readonly class OuidGenerator
     public function generate(): Ouid
     {
         $datetime = $this->clock->now()->setTimezone(new DateTimeZone('UTC'));
+        /** @var non-empty-string $randomBytes */
         $randomBytes = $this->randomizer->getBytes(4);
 
         return Ouid::create($this->namespace, $datetime, $randomBytes);

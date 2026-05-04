@@ -21,7 +21,7 @@ final class CrockfordBase32
     /**
      * Decode map for case-insensitive decoding with equivalents.
      *
-     * @var array<string, int>
+     * @var array<string|int, int>
      */
     private const array DECODE_MAP = [
         '0' => 0, 'O' => 0, 'o' => 0,
@@ -107,6 +107,7 @@ final class CrockfordBase32
 
     /**
      * Decode Crockford Base32 to bytes.
+     * @return non-empty-string
      */
     public static function decodeBytes(string $encoded, int $byteLength): string
     {
@@ -119,6 +120,10 @@ final class CrockfordBase32
 
         for ($i = $byteLength - 1; $i >= 0; $i--) {
             $bytes .= \chr(($number >> ($i * 8)) & 0xFF);
+        }
+
+        if ($bytes === '') {
+            throw new InvalidArgumentException('Decoded bytes cannot be empty');
         }
 
         return $bytes;

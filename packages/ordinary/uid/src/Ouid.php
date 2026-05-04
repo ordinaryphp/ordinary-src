@@ -45,6 +45,7 @@ final class Ouid implements OuidInterface
 
     /**
      * The full OUID value string.
+     * @var non-empty-string
      */
     public string $value {
         get => $this->valueString;
@@ -52,6 +53,7 @@ final class Ouid implements OuidInterface
 
     /**
      * The namespace portion.
+     * @var non-empty-string
      */
     public string $namespace {
         get {
@@ -59,7 +61,7 @@ final class Ouid implements OuidInterface
                 $this->parseOuid();
             }
 
-            return $this->cachedNamespace;
+            return $this->cachedNamespace ?? throw new \RuntimeException('Namespace not set');
         }
     }
 
@@ -72,7 +74,7 @@ final class Ouid implements OuidInterface
                 $this->parseOuid();
             }
 
-            return $this->cachedDatetime;
+            return $this->cachedDatetime ?? throw new \RuntimeException('Datetime not set');
         }
     }
 
@@ -85,13 +87,15 @@ final class Ouid implements OuidInterface
                 $this->parseOuid();
             }
 
-            return $this->cachedRandomBytes;
+            return $this->cachedRandomBytes ?? throw new \RuntimeException('Random bytes not set');
         }
     }
 
-    private string $cachedNamespace;
-    private DateTimeImmutable $cachedDatetime;
-    private string $cachedRandomBytes;
+    /** @var non-empty-string|null */
+    private ?string $cachedNamespace = null;
+    private ?DateTimeImmutable $cachedDatetime = null;
+    /** @var non-empty-string|null */
+    private ?string $cachedRandomBytes = null;
 
     /**
      * @param non-empty-string $valueString
@@ -163,6 +167,7 @@ final class Ouid implements OuidInterface
      * Validate OUID format.
      *
      * @param non-empty-string $value
+     * @return non-empty-string[]
      */
     private function validate(string $value): array
     {
