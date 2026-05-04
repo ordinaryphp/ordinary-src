@@ -18,6 +18,7 @@ trait HasOuidTrait
 
     /**
      * The OUID string value.
+     *
      * @var non-empty-string
      */
     public string $uid {

@@ -64,7 +64,7 @@ final class HasOuidTraitTest extends TestCase
     {
         $ouid = Ouid::create('TEST', new DateTimeImmutable('now', new DateTimeZone('UTC')), "\x01\x02\x03\x04");
 
-        $object = new class($ouid) {
+        $object = new class ($ouid) {
             use HasOuidTrait;
 
             public function __construct(Ouid $ouid)

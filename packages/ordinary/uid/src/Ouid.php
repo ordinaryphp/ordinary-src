@@ -8,10 +8,6 @@ use DateTimeImmutable;
 use DateTimeZone;
 use InvalidArgumentException;
 
-use function preg_match;
-use function sprintf;
-use function str_pad;
-
 /**
  * Immutable implementation of Ordinary Universal Identifier (OUID).
  *
@@ -45,6 +41,7 @@ final class Ouid implements OuidInterface
 
     /**
      * The full OUID value string.
+     *
      * @var non-empty-string
      */
     public string $value {
@@ -53,6 +50,7 @@ final class Ouid implements OuidInterface
 
     /**
      * The namespace portion.
+     *
      * @var non-empty-string
      */
     public string $namespace {
@@ -137,7 +135,7 @@ final class Ouid implements OuidInterface
         $microsecondsEncoded = CrockfordBase32::encode($microseconds, self::MICROSECONDS_LENGTH);
         $randomEncoded = CrockfordBase32::encodeBytes($randomBytes);
 
-        $value = sprintf(
+        $value = \sprintf(
             '%s-%s-%s-%s',
             $namespace,
             $secondsEncoded,
@@ -154,11 +152,11 @@ final class Ouid implements OuidInterface
     public static function nil(): self
     {
         return new self(
-            sprintf(
+            \sprintf(
                 'NIL-%s-%s-%s',
-                str_pad('', self::SECONDS_LENGTH, '0'),
-                str_pad('', self::MICROSECONDS_LENGTH, '0'),
-                str_pad('', self::RANDOM_BYTES_LENGTH, '0'),
+                \str_pad('', self::SECONDS_LENGTH, '0'),
+                \str_pad('', self::MICROSECONDS_LENGTH, '0'),
+                \str_pad('', self::RANDOM_BYTES_LENGTH, '0'),
             ),
         );
     }
@@ -167,13 +165,14 @@ final class Ouid implements OuidInterface
      * Validate OUID format.
      *
      * @param non-empty-string $value
+     *
      * @return non-empty-string[]
      */
     private function validate(string $value): array
     {
-        if (preg_match(self::PATTERN, $value, $matches) !== 1) {
+        if (\preg_match(self::PATTERN, $value, $matches) !== 1) {
             throw new InvalidArgumentException(
-                sprintf('Invalid OUID format: %s', $value),
+                \sprintf('Invalid OUID format: %s', $value),
             );
         }
 
@@ -187,7 +186,7 @@ final class Ouid implements OuidInterface
      */
     private static function validateNamespace(string $namespace): void
     {
-        if (preg_match('/^[A-Z0-9_]+$/', $namespace) !== 1) {
+        if (\preg_match('/^[A-Z0-9_]+$/', $namespace) !== 1) {
             throw new InvalidArgumentException(
                 'Namespace must contain only uppercase alphanumeric characters and underscores',
             );
@@ -203,7 +202,7 @@ final class Ouid implements OuidInterface
     {
         if (\strlen($randomBytes) !== self::RANDOM_BYTES_LENGTH) {
             throw new InvalidArgumentException(
-                sprintf(
+                \sprintf(
                     'Random bytes must be exactly %d bytes, got %d',
                     self::RANDOM_BYTES_LENGTH,
                     \strlen($randomBytes),
@@ -225,7 +224,7 @@ final class Ouid implements OuidInterface
         $microseconds = CrockfordBase32::decode($microsecondsEncoded);
 
         $this->cachedDatetime = new DateTimeImmutable('@' . $seconds, new DateTimeZone('UTC'))
-            ->modify(sprintf('+%d microseconds', $microseconds));
+            ->modify(\sprintf('+%d microseconds', $microseconds));
 
         $this->cachedRandomBytes = CrockfordBase32::decodeBytes($randomEncoded, self::RANDOM_BYTES_LENGTH);
     }
