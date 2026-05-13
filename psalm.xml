@@ -19,7 +19,6 @@
         <directory name="packages"/>
         <ignoreFiles>
             <directory name="packages/*/vendor"/>
-            <directory name="packages/*/tests/Fixtures"/>
         </ignoreFiles>
     </projectFiles>
 </psalm>

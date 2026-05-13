@@ -11,7 +11,6 @@ return RectorConfig::configure()
     ])
     ->withSkip([
         '*/vendor/*',
-        '*/tests/Fixtures/*',
     ])
     ->withPhpSets(php85: true)
     ->withRules([

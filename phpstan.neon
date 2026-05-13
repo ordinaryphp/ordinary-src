@@ -7,7 +7,6 @@ parameters:
         - packages
     excludePaths:
         - packages/*/vendor
-        - packages/*/tests/Fixtures
     ignoreErrors:
         -
             message: '#Dynamic call to static method#'
