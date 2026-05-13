@@ -88,6 +88,8 @@ final class CrockfordBase32
 
     /**
      * Encode bytes to Crockford Base32.
+     *
+     * @return non-empty-string
      */
     public static function encodeBytes(string $bytes): string
     {
