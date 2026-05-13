@@ -37,6 +37,8 @@ final class CrockfordBase32
 
     /**
      * Encode an integer to Crockford Base32.
+     *
+     * @return non-empty-string
      */
     public static function encode(int $number, int $minLength = 1): string
     {
@@ -111,7 +113,7 @@ final class CrockfordBase32
      * Decode Crockford Base32 to bytes.
      *
      * @param non-empty-string $encoded
-     * @param positive-int $byteLength
+     * @param int $byteLength
      *
      * @return non-empty-string
      */
