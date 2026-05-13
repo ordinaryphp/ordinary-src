@@ -18,7 +18,7 @@ jobs:
           - local_path: 'packages/ordinary/uid'
             split_repository: 'uid'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
