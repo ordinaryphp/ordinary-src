@@ -23,7 +23,7 @@ final class OuidGeneratorTest extends TestCase
         $generator = new OuidGenerator('TESTAPP', $clock);
         $ouid = $generator->generate();
 
-        self::assertSame('TESTAPP', $ouid->namespace);
+        $this->assertSame('TESTAPP', $ouid->namespace);
     }
 
     #[Test]
@@ -35,7 +35,7 @@ final class OuidGeneratorTest extends TestCase
         $generator = new OuidGenerator('TESTAPP', $clock);
         $ouid = $generator->generate();
 
-        self::assertSame($fixedTime->format('U'), $ouid->datetime->format('U'));
+        $this->assertSame($fixedTime->format('U'), $ouid->datetime->format('U'));
     }
 
     #[Test]
@@ -46,7 +46,7 @@ final class OuidGeneratorTest extends TestCase
         $ouid1 = $generator->generate();
         $ouid2 = $generator->generate();
 
-        self::assertNotSame($ouid1->value, $ouid2->value);
+        $this->assertNotSame($ouid1->value, $ouid2->value);
     }
 
     #[Test]
@@ -59,8 +59,8 @@ final class OuidGeneratorTest extends TestCase
         $generator = new OuidGenerator('TESTAPP', $clock, $engine);
         $ouid = $generator->generate();
 
-        self::assertNotEmpty($ouid->randomBytes);
-        self::assertSame(4, \strlen($ouid->randomBytes));
+        $this->assertNotEmpty($ouid->randomBytes);
+        $this->assertSame(4, \strlen($ouid->randomBytes));
     }
 
     private function createClock(?DateTimeImmutable $fixedTime = null): ClockInterface

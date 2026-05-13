@@ -26,5 +26,6 @@ return RectorConfig::configure()
         privatization: true,
         instanceOf: true,
         earlyReturn: true,
+        phpunitCodeQuality: true,
     )
     ->withImportNames(importShortClasses: false, removeUnusedImports: true);

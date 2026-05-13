@@ -18,14 +18,14 @@ final class CrockfordBase32Test extends TestCase
     public function it_encodes_zero(): void
     {
         $result = CrockfordBase32::encode(0);
-        self::assertSame('0', $result);
+        $this->assertSame('0', $result);
     }
 
     #[Test]
     public function it_encodes_with_padding(): void
     {
         $result = CrockfordBase32::encode(5, 4);
-        self::assertSame('0005', $result);
+        $this->assertSame('0005', $result);
     }
 
     #[Test]
@@ -33,25 +33,23 @@ final class CrockfordBase32Test extends TestCase
     public function it_encodes_and_decodes_numbers(int $number, string $expected): void
     {
         $encoded = CrockfordBase32::encode($number);
-        self::assertSame($expected, $encoded);
+        $this->assertSame($expected, $encoded);
 
         $decoded = CrockfordBase32::decode($encoded);
-        self::assertSame($number, $decoded);
+        $this->assertSame($number, $decoded);
     }
 
     /**
-     * @return array<string, array{int, string}>
+     * @return \Iterator<string, array{int, string}>
      */
-    public static function encodeDecodeProvider(): array
+    public static function encodeDecodeProvider(): \Iterator
     {
-        return [
-            'one' => [1, '1'],
-            'ten' => [10, 'A'],
-            'thirty-two' => [32, '10'],
-            'thousand' => [1000, 'Z8'],
-            'million' => [1000000, 'YGJ0'],
-            'max-seconds-100-years' => [3155760000, '2Y1J4W0'],
-        ];
+        yield 'one' => [1, '1'];
+        yield 'ten' => [10, 'A'];
+        yield 'thirty-two' => [32, '10'];
+        yield 'thousand' => [1000, 'Z8'];
+        yield 'million' => [1000000, 'YGJ0'];
+        yield 'max-seconds-100-years' => [3155760000, '2Y1J4W0'];
     }
 
     #[Test]
@@ -61,22 +59,22 @@ final class CrockfordBase32Test extends TestCase
         $lower = CrockfordBase32::decode('abc');
         $mixed = CrockfordBase32::decode('AbC');
 
-        self::assertSame($upper, $lower);
-        self::assertSame($upper, $mixed);
+        $this->assertSame($upper, $lower);
+        $this->assertSame($upper, $mixed);
     }
 
     #[Test]
     public function it_handles_symbol_equivalents(): void
     {
         // O and 0 are equivalent
-        self::assertSame(CrockfordBase32::decode('0'), CrockfordBase32::decode('O'));
-        self::assertSame(CrockfordBase32::decode('0'), CrockfordBase32::decode('o'));
+        $this->assertSame(CrockfordBase32::decode('0'), CrockfordBase32::decode('O'));
+        $this->assertSame(CrockfordBase32::decode('0'), CrockfordBase32::decode('o'));
 
         // I, L, and 1 are equivalent
-        self::assertSame(CrockfordBase32::decode('1'), CrockfordBase32::decode('I'));
-        self::assertSame(CrockfordBase32::decode('1'), CrockfordBase32::decode('i'));
-        self::assertSame(CrockfordBase32::decode('1'), CrockfordBase32::decode('L'));
-        self::assertSame(CrockfordBase32::decode('1'), CrockfordBase32::decode('l'));
+        $this->assertSame(CrockfordBase32::decode('1'), CrockfordBase32::decode('I'));
+        $this->assertSame(CrockfordBase32::decode('1'), CrockfordBase32::decode('i'));
+        $this->assertSame(CrockfordBase32::decode('1'), CrockfordBase32::decode('L'));
+        $this->assertSame(CrockfordBase32::decode('1'), CrockfordBase32::decode('l'));
     }
 
     #[Test]
@@ -121,7 +119,7 @@ final class CrockfordBase32Test extends TestCase
         $bytes = "\x01\x02\x03\x04";
         $encoded = CrockfordBase32::encodeBytes($bytes);
 
-        self::assertNotEmpty($encoded);
+        $this->assertNotEmpty($encoded);
     }
 
     #[Test]
@@ -131,7 +129,7 @@ final class CrockfordBase32Test extends TestCase
         $encoded = CrockfordBase32::encodeBytes($original);
         $decoded = CrockfordBase32::decodeBytes($encoded, 4);
 
-        self::assertSame($original, $decoded);
+        $this->assertSame($original, $decoded);
     }
 
     #[Test]

@@ -24,10 +24,10 @@ final class OuidTest extends TestCase
 
         $ouid = Ouid::create($namespace, $datetime, $randomBytes);
 
-        self::assertSame($namespace, $ouid->namespace);
-        self::assertSame($datetime->format('U'), $ouid->datetime->format('U'));
-        self::assertSame($datetime->format('u'), $ouid->datetime->format('u'));
-        self::assertSame($randomBytes, $ouid->randomBytes);
+        $this->assertSame($namespace, $ouid->namespace);
+        $this->assertSame($datetime->format('U'), $ouid->datetime->format('U'));
+        $this->assertSame($datetime->format('u'), $ouid->datetime->format('u'));
+        $this->assertSame($randomBytes, $ouid->randomBytes);
     }
 
     #[Test]
@@ -36,7 +36,7 @@ final class OuidTest extends TestCase
         $value = 'MYAPP-0000001-0000-01020304';
         $ouid = Ouid::fromString($value);
 
-        self::assertSame($value, $ouid->value);
+        $this->assertSame($value, $ouid->value);
     }
 
     #[Test]
@@ -44,8 +44,8 @@ final class OuidTest extends TestCase
     {
         $nil = Ouid::nil();
 
-        self::assertSame('NIL', $nil->namespace);
-        self::assertStringContainsString('NIL-', $nil->value);
+        $this->assertSame('NIL', $nil->namespace);
+        $this->assertStringContainsString('NIL-', $nil->value);
     }
 
     #[Test]
@@ -68,7 +68,7 @@ final class OuidTest extends TestCase
 
         $ouid = Ouid::create('MY_APP_123', $datetime, $randomBytes);
 
-        self::assertSame('MY_APP_123', $ouid->namespace);
+        $this->assertSame('MY_APP_123', $ouid->namespace);
     }
 
     #[Test]
@@ -105,10 +105,10 @@ final class OuidTest extends TestCase
         // Re-create from string to test lazy parsing
         $parsed = Ouid::fromString($value);
 
-        self::assertSame($namespace, $parsed->namespace);
-        self::assertSame($datetime->format('U'), $parsed->datetime->format('U'));
-        self::assertSame($datetime->format('u'), $parsed->datetime->format('u'));
-        self::assertSame($randomBytes, $parsed->randomBytes);
+        $this->assertSame($namespace, $parsed->namespace);
+        $this->assertSame($datetime->format('U'), $parsed->datetime->format('U'));
+        $this->assertSame($datetime->format('u'), $parsed->datetime->format('u'));
+        $this->assertSame($randomBytes, $parsed->randomBytes);
     }
 
     #[Test]
@@ -120,7 +120,7 @@ final class OuidTest extends TestCase
         $value1 = $ouid->value;
         $value2 = $ouid->value;
 
-        self::assertSame($value1, $value2);
+        $this->assertSame($value1, $value2);
     }
 
     #[Test]
@@ -131,7 +131,7 @@ final class OuidTest extends TestCase
 
         $ouid = Ouid::create('TEST', $datetime, $randomBytes);
 
-        self::assertSame('999999', $ouid->datetime->format('u'));
+        $this->assertSame('999999', $ouid->datetime->format('u'));
     }
 
     #[Test]
@@ -142,6 +142,6 @@ final class OuidTest extends TestCase
 
         $ouid = Ouid::create('TEST', $datetime, $randomBytes);
 
-        self::assertSame('000000', $ouid->datetime->format('u'));
+        $this->assertSame('000000', $ouid->datetime->format('u'));
     }
 }

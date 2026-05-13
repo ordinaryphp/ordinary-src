@@ -22,8 +22,8 @@ final class HasMutableOuidTraitTest extends TestCase
             use HasMutableOuidTrait;
         };
 
-        self::assertSame(Ouid::nil()->value, $object->uid);
-        self::assertSame('NIL', $object->getOuid()->namespace);
+        $this->assertSame(Ouid::nil()->value, $object->uid);
+        $this->assertSame('NIL', $object->getOuid()->namespace);
     }
 
     #[Test]
@@ -36,8 +36,8 @@ final class HasMutableOuidTraitTest extends TestCase
         $ouid = Ouid::create('TEST', new DateTimeImmutable('now', new DateTimeZone('UTC')), "\x01\x02\x03\x04");
         $object->uid = $ouid->value;
 
-        self::assertSame($ouid->value, $object->uid);
-        self::assertSame($ouid->value, $object->getOuid()->value);
+        $this->assertSame($ouid->value, $object->uid);
+        $this->assertSame($ouid->value, $object->getOuid()->value);
     }
 
     #[Test]
@@ -51,12 +51,12 @@ final class HasMutableOuidTraitTest extends TestCase
         $ouid2 = Ouid::create('TEST2', new DateTimeImmutable('now', new DateTimeZone('UTC')), "\x05\x06\x07\x08");
 
         $object->uid = $ouid1->value;
-        self::assertSame($ouid1->value, $object->uid);
-        self::assertSame($ouid1->value, $object->getOuid()->value);
+        $this->assertSame($ouid1->value, $object->uid);
+        $this->assertSame($ouid1->value, $object->getOuid()->value);
 
         $object->uid = $ouid2->value;
-        self::assertSame($ouid2->value, $object->uid);
-        self::assertSame($ouid2->value, $object->getOuid()->value);
+        $this->assertSame($ouid2->value, $object->uid);
+        $this->assertSame($ouid2->value, $object->getOuid()->value);
     }
 
     #[Test]
@@ -72,7 +72,7 @@ final class HasMutableOuidTraitTest extends TestCase
         $nil = Ouid::nil();
         $object->uid = $nil->value;
 
-        self::assertSame($nil->value, $object->uid);
-        self::assertSame($nil->value, $object->getOuid()->value);
+        $this->assertSame($nil->value, $object->uid);
+        $this->assertSame($nil->value, $object->getOuid()->value);
     }
 }

@@ -23,8 +23,8 @@ final class HasOuidTraitTest extends TestCase
             use HasOuidTrait;
         };
 
-        self::assertSame(Ouid::nil()->value, $object->uid);
-        self::assertSame('NIL', $object->getOuid()->namespace);
+        $this->assertSame(Ouid::nil()->value, $object->uid);
+        $this->assertSame('NIL', $object->getOuid()->namespace);
     }
 
     #[Test]
@@ -37,8 +37,8 @@ final class HasOuidTraitTest extends TestCase
         $ouid = Ouid::create('TEST', new DateTimeImmutable('now', new DateTimeZone('UTC')), "\x01\x02\x03\x04");
         $object->uid = $ouid->value;
 
-        self::assertSame($ouid->value, $object->uid);
-        self::assertSame($ouid->value, $object->getOuid()->value);
+        $this->assertSame($ouid->value, $object->uid);
+        $this->assertSame($ouid->value, $object->getOuid()->value);
     }
 
     #[Test]
@@ -73,7 +73,7 @@ final class HasOuidTraitTest extends TestCase
             }
         };
 
-        self::assertSame($ouid->value, $object->uid);
-        self::assertSame($ouid->value, $object->getOuid()->value);
+        $this->assertSame($ouid->value, $object->uid);
+        $this->assertSame($ouid->value, $object->getOuid()->value);
     }
 }
