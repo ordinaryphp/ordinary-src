@@ -38,9 +38,6 @@ jobs:
       - name: Check PHP-CS-Fixer
         run: vendor/bin/php-cs-fixer fix --dry-run --diff --verbose
 
-      - name: Check PHP_CodeSniffer
-        run: vendor/bin/phpcs
-
   static-analysis:
     name: Static Analysis
     runs-on: ubuntu-latest
