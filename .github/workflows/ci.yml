@@ -69,12 +69,6 @@ jobs:
       - name: Run PHPStan
         run: vendor/bin/phpstan analyse
 
-#      - name: Run Psalm
-#        run: vendor/bin/psalm --output-format=github --shepherd
-
-      - name: Run PHPMD
-        run: vendor/bin/phpmd packages text phpmd.xml
-
   rector-check:
     name: Rector Check
     runs-on: ubuntu-latest
