@@ -91,7 +91,9 @@ final class Ouid implements OuidInterface
 
     /** @var non-empty-string|null */
     private ?string $cachedNamespace = null;
+
     private ?DateTimeImmutable $cachedDatetime = null;
+
     /** @var non-empty-string|null */
     private ?string $cachedRandomBytes = null;
 
