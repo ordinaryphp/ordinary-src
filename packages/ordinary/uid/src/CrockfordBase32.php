@@ -113,7 +113,6 @@ final class CrockfordBase32
      * Decode Crockford Base32 to bytes.
      *
      * @param non-empty-string $encoded
-     * @param int $byteLength
      *
      * @return non-empty-string
      */
