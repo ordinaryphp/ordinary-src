@@ -9,6 +9,9 @@ parameters:
         - packages/*/vendor
         - packages/*/tests/Fixtures
     ignoreErrors:
+        -
+            message: '#Dynamic call to static method#'
+            path: packages/*/tests/*
     strictRules:
         allRules: true
         disallowedLooseComparison: true
