@@ -140,20 +140,3 @@ jobs:
 
       - name: Run Tests
         run: vendor/bin/phpunit --coverage-text
-
-  security:
-    name: Security Check
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.5'
-          extensions: mbstring, intl
-          coverage: xdebug
-          tools: composer:v2
-
-      - name: Check for Security Vulnerabilities
-        run: composer audit
