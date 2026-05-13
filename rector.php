@@ -22,7 +22,7 @@ return RectorConfig::configure()
         codeQuality: true,
         typeDeclarations: true,
         privatization: true,
+        instanceOf: true,
         earlyReturn: true,
-        instanceof: true,
     )
     ->withImportNames(importShortClasses: false, removeUnusedImports: true);
