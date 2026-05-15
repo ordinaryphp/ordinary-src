@@ -130,7 +130,7 @@ final class CrockfordBase32
         }
 
         if ($bytes === '') {
-            throw new InvalidArgumentException('Decoded bytes cannot be empty');
+            throw new \LogicException('Decoded bytes cannot be empty'); // this should never happen, but if we do, that's on us
         }
 
         return $bytes;
