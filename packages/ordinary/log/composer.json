@@ -1,0 +1,40 @@
+{
+  "name": "ordinary/log",
+  "description": "Structured logging implementation for OrdinaryPHP",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "OrdinaryPHP Contributors"
+    }
+  ],
+  "require": {
+    "php": "^8.5",
+    "psr/log": "^3.0"
+  },
+  "require-dev": {
+    "aws/aws-sdk-php": "^3.0",
+    "phpunit/phpunit": "^13.0"
+  },
+  "suggest": {
+    "aws/aws-sdk-php": "Required to use CloudWatchDriver",
+    "revolt/event-loop": "Required for async log dispatch via Logger's $dispatcher parameter"
+  },
+  "autoload": {
+    "psr-4": {
+      "Ordinary\\Log\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Ordinary\\Log\\Tests\\": "tests/"
+    }
+  },
+  "config": {
+    "sort-packages": true,
+    "optimize-autoloader": true,
+    "preferred-install": "dist"
+  },
+  "minimum-stability": "stable",
+  "prefer-stable": true
+}
