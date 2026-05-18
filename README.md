@@ -45,9 +45,6 @@ vendor/bin/psalm
 
 # Rector
 vendor/bin/rector process
-
-# PHP Mess Detector
-vendor/bin/phpmd packages text phpmd.xml
 ```
 
 ### Docker Environment

@@ -47,9 +47,6 @@ vendor/bin/psalm
 # Auto-refactor code
 vendor/bin/rector process
 
-# Check for code smells
-vendor/bin/phpmd packages text phpmd.xml
-
 # Run all tests
 vendor/bin/phpunit
 ```
