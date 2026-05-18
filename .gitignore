@@ -1,8 +1,8 @@
 # Composer
 /vendor/
 composer.lock
-packages/*/vendor/
-packages/*/composer.lock
+packages/*/*/vendor/
+packages/*/*/composer.lock
 
 # PHPUnit
 .phpunit.cache/
@@ -14,6 +14,9 @@ packages/*/composer.lock
 *.swp
 *.swo
 *~
+
+# External Tools
+/.claude/
 
 # OS
 .DS_Store
