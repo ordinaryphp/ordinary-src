@@ -6,9 +6,9 @@ namespace Ordinary\Log\Psr;
 
 use DateTimeImmutable;
 use Ordinary\Log\GenericLogItem;
+use Ordinary\Log\LoggerInterface;
 use Ordinary\Log\LogItemInterface;
 use Ordinary\Log\LogLevel;
-use Ordinary\Log\LoggerInterface;
 use Psr\Log\LoggerInterface as PsrLoggerInterface;
 use Psr\Log\LogLevel as PsrLogLevel;
 
@@ -102,6 +102,7 @@ final readonly class PsrLoggerAdapter implements PsrLoggerInterface
      * passed through unchanged so they appear as regular context in the log output.
      *
      * @param array<string, mixed> $context
+     *
      * @return array<string, mixed>
      */
     private function translateContext(array $context): array

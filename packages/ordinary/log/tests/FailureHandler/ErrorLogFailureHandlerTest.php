@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Ordinary\Log\Tests\FailureHandler;
 
-use Ordinary\Log\LogDriverInterface;
 use DateTimeImmutable;
 use Ordinary\Log\FailureHandler\ErrorLogFailureHandler;
 use Ordinary\Log\GenericLogItem;
+use Ordinary\Log\LogDriverInterface;
 use Ordinary\Log\LogFailureException;
 use Ordinary\Log\LogLevel;
 use PHPUnit\Framework\Attributes\CoversClass;

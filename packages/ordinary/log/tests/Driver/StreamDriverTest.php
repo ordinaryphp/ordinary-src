@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Ordinary\Log\Tests\Driver;
 
-use Ordinary\Log\LogFormatterInterface;
 use DateTimeImmutable;
 use Ordinary\Log\Driver\StreamDriver;
 use Ordinary\Log\GenericDateTimeFormatter;
 use Ordinary\Log\GenericLevelFormatter;
 use Ordinary\Log\GenericLogFormatter;
 use Ordinary\Log\GenericLogItem;
+use Ordinary\Log\LogFormatterInterface;
 use Ordinary\Log\LogLevel;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;

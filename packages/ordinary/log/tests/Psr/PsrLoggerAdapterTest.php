@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Ordinary\Log\Tests\Psr;
 
+use Ordinary\Log\LoggerInterface;
 use Ordinary\Log\LogItemInterface;
 use Ordinary\Log\LogLevel;
-use Ordinary\Log\LoggerInterface;
 use Ordinary\Log\Psr\PsrLoggerAdapter;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
@@ -78,7 +78,7 @@ final class PsrLoggerAdapterTest extends TestCase
             $this->assertArrayHasKey(
                 LogItemInterface::RESERVED_EXCEPTION,
                 $capturedContext ?? [],
-                sprintf('Method %s() did not translate the exception key', $method),
+                \sprintf('Method %s() did not translate the exception key', $method),
             );
         }
     }

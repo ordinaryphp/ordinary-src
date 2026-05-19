@@ -20,6 +20,6 @@ final readonly class IsLevel implements LogMatcherInterface
 
     public function matches(LogItemInterface $logItem): bool
     {
-        return array_any($this->levels, fn(LogLevel $level): bool => $logItem->level->isSameAs($level));
+        return \array_any($this->levels, fn(LogLevel $level): bool => $logItem->level->isSameAs($level));
     }
 }

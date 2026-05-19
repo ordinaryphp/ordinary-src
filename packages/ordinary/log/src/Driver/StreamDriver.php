@@ -18,9 +18,7 @@ use Ordinary\Log\LogItemInterface;
 final class StreamDriver implements LogDriverInterface
 {
     /** @param resource $stream A writable stream resource obtained via fopen(). */
-    public function __construct(private $stream, private readonly LogFormatterInterface $formatter = new GenericLogFormatter())
-    {
-    }
+    public function __construct(private $stream, private readonly LogFormatterInterface $formatter = new GenericLogFormatter()) {}
 
     public function handleLog(LogItemInterface $logItem): void
     {

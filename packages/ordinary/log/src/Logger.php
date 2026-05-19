@@ -38,19 +38,19 @@ final class Logger implements LoggerInterface
 
     /**
      * @param string $channel
-     *        Optional channel name stamped on every log item before dispatch and
-     *        processors run. Appears as a top-level `"channel"` field in
-     *        {@see \Ordinary\Log\JsonLogFormatter} output and as the `{@channel}`
-     *        placeholder in {@see \Ordinary\Log\GenericLogFormatter}.
+     *                        Optional channel name stamped on every log item before dispatch and
+     *                        processors run. Appears as a top-level `"channel"` field in
+     *                        {@see \Ordinary\Log\JsonLogFormatter} output and as the `{@channel}`
+     *                        placeholder in {@see \Ordinary\Log\GenericLogFormatter}.
      * @param null|\Closure(\Closure(): void): void $dispatcher
-     *        When provided, each driver call is passed to this closure as a
-     *        zero-argument operation. Use this to queue writes onto an event
-     *        loop. Drivers implementing {@see SynchronousDriverInterface} are
-     *        always invoked immediately, bypassing the dispatcher.
+     *                                                          When provided, each driver call is passed to this closure as a
+     *                                                          zero-argument operation. Use this to queue writes onto an event
+     *                                                          loop. Drivers implementing {@see SynchronousDriverInterface} are
+     *                                                          always invoked immediately, bypassing the dispatcher.
      * @param LogFailureHandlerInterface $onFailure
-     *        Called when a driver throws. Defaults to {@see ErrorLogFailureHandler},
-     *        which writes a message to PHP's error log. Pass
-     *        {@see \Ordinary\Log\FailureHandler\NoOpFailureHandler} to silence failures.
+     *                                              Called when a driver throws. Defaults to {@see ErrorLogFailureHandler},
+     *                                              which writes a message to PHP's error log. Pass
+     *                                              {@see \Ordinary\Log\FailureHandler\NoOpFailureHandler} to silence failures.
      */
     public function __construct(
         public readonly string $channel = '',
@@ -115,10 +115,11 @@ final class Logger implements LoggerInterface
      * Registers a driver with a group.
      *
      * @param LogMatcherInterface|null $matcher
-     *        Applied after the group matcher. The driver only receives items
-     *        that pass both the group matcher AND this matcher.
+     *                                          Applied after the group matcher. The driver only receives items
+     *                                          that pass both the group matcher AND this matcher.
      * @param string $group
-     *        Defaults to "default". The group must exist; call addGroup() first.
+     *                      Defaults to "default". The group must exist; call addGroup() first.
+     *
      * @throws \InvalidArgumentException if the group does not exist
      */
     public function add(

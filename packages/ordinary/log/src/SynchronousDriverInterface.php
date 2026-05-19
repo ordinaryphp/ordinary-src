@@ -14,6 +14,4 @@ namespace Ordinary\Log;
  * continues — for example, a driver writing to a local stream where the caller
  * expects the data to be flushed before returning.
  */
-interface SynchronousDriverInterface extends LogDriverInterface
-{
-}
+interface SynchronousDriverInterface extends LogDriverInterface {}

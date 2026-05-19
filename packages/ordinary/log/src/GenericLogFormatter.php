@@ -72,6 +72,6 @@ final readonly class GenericLogFormatter implements LogFormatterInterface
             return 'null';
         }
 
-        return get_debug_type($value);
+        return \get_debug_type($value);
     }
 }

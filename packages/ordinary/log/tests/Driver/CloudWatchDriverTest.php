@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Ordinary\Log\Tests\Driver;
 
-use PHPUnit\Framework\MockObject\MockObject;
 use Aws\CloudWatchLogs\CloudWatchLogsClient;
 use DateTimeImmutable;
 use Ordinary\Log\Driver\CloudWatchDriver;
@@ -16,6 +15,7 @@ use Ordinary\Log\LogLevel;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(CloudWatchDriver::class)]

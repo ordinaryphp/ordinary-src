@@ -6,14 +6,14 @@ namespace Ordinary\Log\Tests;
 
 use Ordinary\Log\FailureHandler\NoOpFailureHandler;
 use Ordinary\Log\GenericCallableProcessor;
-use Ordinary\Log\LogDriverInterface;
 use Ordinary\Log\ImmutableLogItemInterface;
+use Ordinary\Log\LogDriverInterface;
 use Ordinary\Log\LogFailureExceptionInterface;
 use Ordinary\Log\LogFailureHandlerInterface;
-use Ordinary\Log\LogItemInterface;
-use Ordinary\Log\LogProcessorInterface;
-use Ordinary\Log\LogLevel;
 use Ordinary\Log\Logger;
+use Ordinary\Log\LogItemInterface;
+use Ordinary\Log\LogLevel;
+use Ordinary\Log\LogProcessorInterface;
 use Ordinary\Log\Matcher\IsLevelOrHigher;
 use Ordinary\Log\SynchronousDriverInterface;
 use PHPUnit\Framework\Attributes\CoversClass;

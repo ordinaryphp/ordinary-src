@@ -8,11 +8,11 @@ final class LogFailureException extends \RuntimeException implements LogFailureE
 {
     /**
      * @param LogItemInterface $logItem
-     *        The log item that was being dispatched when the failure occurred.
+     *                                  The log item that was being dispatched when the failure occurred.
      * @param \Throwable $previous
-     *        The underlying exception thrown by the driver.
+     *                             The underlying exception thrown by the driver.
      * @param LogDriverInterface|null $failingDriver
-     *        The driver that threw. Null only when constructed outside the Logger.
+     *                                               The driver that threw. Null only when constructed outside the Logger.
      */
     public function __construct(
         private readonly LogItemInterface $logItem,

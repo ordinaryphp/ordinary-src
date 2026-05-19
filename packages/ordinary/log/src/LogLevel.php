@@ -53,7 +53,7 @@ enum LogLevel
 
         $exact = \array_find(
             self::cases(),
-            fn (self $case): bool => $case->getFullName() === $normalized,
+            fn(self $case): bool => $case->getFullName() === $normalized,
         );
 
         if ($exact instanceof self) {
@@ -62,7 +62,7 @@ enum LogLevel
 
         $prefix = \array_find(
             self::cases(),
-            fn (self $case): bool => \str_starts_with($case->getFullName(), $normalized)
+            fn(self $case): bool => \str_starts_with($case->getFullName(), $normalized)
                 && \strlen($normalized) >= \strlen($case->getShortestIdentifiablePrefix()),
         );
 

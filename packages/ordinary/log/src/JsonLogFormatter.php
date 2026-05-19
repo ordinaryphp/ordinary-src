@@ -73,6 +73,7 @@ final readonly class JsonLogFormatter implements LogFormatterInterface
 
     /**
      * @param array<string, mixed> $context
+     *
      * @return array<string, mixed>
      */
     private function normalizeContext(array $context): array
