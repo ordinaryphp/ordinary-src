@@ -4,12 +4,16 @@ declare(strict_types=1);
 
 namespace Ordinary\Log\Driver;
 
+use Ordinary\Log\GenericLogFormatter;
 use Ordinary\Log\LogDriverInterface;
 use Ordinary\Log\LogFormatterInterface;
 use Ordinary\Log\LogItemInterface;
 
 /**
  * Writes a formatted log line to any writable stream resource.
+ *
+ * Defaults to {@see GenericLogFormatter} for human-readable text output.
+ * Pass a {@see \Ordinary\Log\JsonLogFormatter} for structured JSON lines.
  */
 final class StreamDriver implements LogDriverInterface
 {
@@ -19,7 +23,7 @@ final class StreamDriver implements LogDriverInterface
     /** @param resource $stream A writable stream resource obtained via fopen(). */
     public function __construct(
         $stream,
-        private readonly LogFormatterInterface $formatter,
+        private readonly LogFormatterInterface $formatter = new GenericLogFormatter(),
     ) {
         $this->stream = $stream;
     }
