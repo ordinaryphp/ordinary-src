@@ -20,7 +20,7 @@ final class GenericCallableMatcherTest extends TestCase
     public function it_returns_true_when_closure_returns_true(): void
     {
         $item = new GenericLogItem(LogLevel::Info, 'msg', new DateTimeImmutable());
-        $matcher = new GenericCallableMatcher(fn(LogItemInterface $i) => true);
+        $matcher = new GenericCallableMatcher(fn(LogItemInterface $i): true => true);
 
         $this->assertTrue($matcher->matches($item));
     }
@@ -29,7 +29,7 @@ final class GenericCallableMatcherTest extends TestCase
     public function it_returns_false_when_closure_returns_false(): void
     {
         $item = new GenericLogItem(LogLevel::Info, 'msg', new DateTimeImmutable());
-        $matcher = new GenericCallableMatcher(fn(LogItemInterface $i) => false);
+        $matcher = new GenericCallableMatcher(fn(LogItemInterface $i): false => false);
 
         $this->assertFalse($matcher->matches($item));
     }
@@ -57,7 +57,7 @@ final class GenericCallableMatcherTest extends TestCase
         $withoutKey = new GenericLogItem(LogLevel::Info, 'msg', new DateTimeImmutable());
 
         $matcher = new GenericCallableMatcher(
-            fn(LogItemInterface $i) => \array_key_exists('user_id', $i->context),
+            fn(LogItemInterface $i): bool => \array_key_exists('user_id', $i->context),
         );
 
         $this->assertTrue($matcher->matches($withKey));

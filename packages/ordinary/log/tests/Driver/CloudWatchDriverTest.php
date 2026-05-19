@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ordinary\Log\Tests\Driver;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use Aws\CloudWatchLogs\CloudWatchLogsClient;
 use DateTimeImmutable;
 use Ordinary\Log\Driver\CloudWatchDriver;
@@ -32,7 +33,7 @@ final class CloudWatchDriverTest extends TestCase
         return new GenericLogFormatter(new GenericDateTimeFormatter(), new GenericLevelFormatter());
     }
 
-    /** @return CloudWatchLogsClient&\PHPUnit\Framework\MockObject\MockObject */
+    /** @return CloudWatchLogsClient&MockObject */
     private function makeClient(): CloudWatchLogsClient
     {
         return $this->getMockBuilder(CloudWatchLogsClient::class)
@@ -50,7 +51,7 @@ final class CloudWatchDriverTest extends TestCase
             ->method('__call')
             ->with('putLogEvents', $this->callback(function (array $argsList): bool {
                 $event = $argsList[0]['logEvents'][0];
-                $decoded = \json_decode($event['message'], true);
+                $decoded = \json_decode((string) $event['message'], true);
                 $this->assertIsArray($decoded);
                 $this->assertArrayHasKey('level', $decoded);
                 $this->assertArrayHasKey('message', $decoded);
@@ -96,7 +97,7 @@ final class CloudWatchDriverTest extends TestCase
                 $args = $argsList[0];
                 $event = $args['logEvents'][0];
                 $this->assertIsInt($event['timestamp']);
-                $this->assertGreaterThan(\time(), (int) $event['timestamp']);
+                $this->assertGreaterThan(\time(), $event['timestamp']);
                 return true;
             }));
 

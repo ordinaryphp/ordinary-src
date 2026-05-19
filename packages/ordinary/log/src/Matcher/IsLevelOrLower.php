@@ -8,9 +8,9 @@ use Ordinary\Log\LogItemInterface;
 use Ordinary\Log\LogLevel;
 use Ordinary\Log\LogMatcherInterface;
 
-final class IsLevelOrLower implements LogMatcherInterface
+final readonly class IsLevelOrLower implements LogMatcherInterface
 {
-    public function __construct(private readonly LogLevel $level) {}
+    public function __construct(private LogLevel $level) {}
 
     public function matches(LogItemInterface $logItem): bool
     {

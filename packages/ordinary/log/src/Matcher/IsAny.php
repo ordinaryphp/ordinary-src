@@ -7,15 +7,11 @@ namespace Ordinary\Log\Matcher;
 use Ordinary\Log\LogItemInterface;
 use Ordinary\Log\LogMatcherInterface;
 
-final class IsAny implements LogMatcherInterface
+final readonly class IsAny implements LogMatcherInterface
 {
-    /** @var list<LogMatcherInterface> */
-    private readonly array $matchers;
-
     /** @param list<LogMatcherInterface> $matchers */
-    public function __construct(array $matchers)
+    public function __construct(private array $matchers)
     {
-        $this->matchers = $matchers;
     }
 
     public function matches(LogItemInterface $logItem): bool

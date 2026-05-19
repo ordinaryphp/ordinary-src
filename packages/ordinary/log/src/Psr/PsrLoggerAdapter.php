@@ -24,10 +24,10 @@ use Psr\Log\LogLevel as PsrLogLevel;
  * Obtain an instance via the concrete logger rather than depending on this
  * adapter directly; it exists solely for interoperability with PSR-3 consumers.
  */
-final class PsrLoggerAdapter implements PsrLoggerInterface
+final readonly class PsrLoggerAdapter implements PsrLoggerInterface
 {
     public function __construct(
-        private readonly LoggerInterface $logger,
+        private LoggerInterface $logger,
     ) {}
 
     /** @param array<string, mixed> $context */

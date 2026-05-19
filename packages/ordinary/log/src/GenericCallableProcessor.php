@@ -16,10 +16,10 @@ namespace Ordinary\Log;
  * ));
  * ```
  */
-final class GenericCallableProcessor implements LogProcessorInterface
+final readonly class GenericCallableProcessor implements LogProcessorInterface
 {
     /** @param \Closure(ImmutableLogItemInterface): ImmutableLogItemInterface $processor */
-    public function __construct(private readonly \Closure $processor) {}
+    public function __construct(private \Closure $processor) {}
 
     public function process(LogItemInterface $logItem): LogItemInterface
     {

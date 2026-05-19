@@ -15,13 +15,9 @@ use Ordinary\Log\LogFailureHandlerInterface;
  */
 final class StderrFailureHandler implements LogFailureHandlerInterface
 {
-    /** @var resource */
-    private $stream;
-
     /** @param resource $stream Defaults to STDERR. */
-    public function __construct($stream = \STDERR)
+    public function __construct(private $stream = \STDERR)
     {
-        $this->stream = $stream;
     }
 
     public function handleLogFailure(LogFailureExceptionInterface $e): void

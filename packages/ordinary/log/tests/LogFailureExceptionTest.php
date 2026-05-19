@@ -53,7 +53,7 @@ final class LogFailureExceptionTest extends TestCase
             new \RuntimeException('fail'),
         );
 
-        $this->assertNull($e->getFailingDriver());
+        $this->assertNotInstanceOf(LogDriverInterface::class, $e->getFailingDriver());
     }
 
     #[Test]

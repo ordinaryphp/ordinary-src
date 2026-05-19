@@ -29,7 +29,7 @@ final class PsrLoggerAdapterTest extends TestCase
             },
         );
 
-        (new PsrLoggerAdapter($inner))->error('test', ['exception' => $exception]);
+        new PsrLoggerAdapter($inner)->error('test', ['exception' => $exception]);
 
         $this->assertIsArray($capturedContext);
         $this->assertArrayHasKey(LogItemInterface::RESERVED_EXCEPTION, $capturedContext);
@@ -49,7 +49,7 @@ final class PsrLoggerAdapterTest extends TestCase
             },
         );
 
-        (new PsrLoggerAdapter($inner))->error('test', ['exception' => 'just a string']);
+        new PsrLoggerAdapter($inner)->error('test', ['exception' => 'just a string']);
 
         $this->assertIsArray($capturedContext);
         $this->assertArrayHasKey('exception', $capturedContext);
@@ -73,12 +73,12 @@ final class PsrLoggerAdapterTest extends TestCase
                 },
             );
 
-            (new PsrLoggerAdapter($inner))->{$method}('test', ['exception' => $exception]);
+            new PsrLoggerAdapter($inner)->{$method}('test', ['exception' => $exception]);
 
             $this->assertArrayHasKey(
                 LogItemInterface::RESERVED_EXCEPTION,
                 $capturedContext ?? [],
-                "Method {$method}() did not translate the exception key",
+                sprintf('Method %s() did not translate the exception key', $method),
             );
         }
     }
@@ -95,7 +95,7 @@ final class PsrLoggerAdapterTest extends TestCase
             },
         );
 
-        (new PsrLoggerAdapter($inner))->log(PsrLogLevel::WARNING, 'test');
+        new PsrLoggerAdapter($inner)->log(PsrLogLevel::WARNING, 'test');
 
         $this->assertInstanceOf(LogItemInterface::class, $capturedItem);
         $this->assertSame(LogLevel::Warning, $capturedItem->level);
@@ -114,7 +114,7 @@ final class PsrLoggerAdapterTest extends TestCase
             },
         );
 
-        (new PsrLoggerAdapter($inner))->log(PsrLogLevel::ERROR, 'test', ['exception' => $exception]);
+        new PsrLoggerAdapter($inner)->log(PsrLogLevel::ERROR, 'test', ['exception' => $exception]);
 
         $this->assertInstanceOf(LogItemInterface::class, $capturedItem);
         $this->assertArrayHasKey(LogItemInterface::RESERVED_EXCEPTION, $capturedItem->context);
@@ -128,7 +128,7 @@ final class PsrLoggerAdapterTest extends TestCase
 
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Unknown PSR log level');
-        (new PsrLoggerAdapter($inner))->log('not-a-level', 'test');
+        new PsrLoggerAdapter($inner)->log('not-a-level', 'test');
     }
 
     #[Test]
@@ -138,6 +138,6 @@ final class PsrLoggerAdapterTest extends TestCase
 
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Log level must be a string');
-        (new PsrLoggerAdapter($inner))->log(42, 'test');
+        new PsrLoggerAdapter($inner)->log(42, 'test');
     }
 }

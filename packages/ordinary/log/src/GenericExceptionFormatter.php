@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Ordinary\Log;
 
-final class GenericExceptionFormatter implements ExceptionFormatterInterface
+final readonly class GenericExceptionFormatter implements ExceptionFormatterInterface
 {
     public function __construct(
-        private readonly bool $includeTrace = true,
-        private readonly bool $includePrevious = true,
-        private readonly int $traceDepth = 10,
+        private bool $includeTrace = true,
+        private bool $includePrevious = true,
+        private int $traceDepth = 10,
     ) {}
 
     public function formatException(\Throwable $throwable): string

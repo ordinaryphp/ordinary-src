@@ -23,7 +23,7 @@ final class LogGroup
 
     public function matches(LogItemInterface $logItem): bool
     {
-        return $this->matcher === null || $this->matcher->matches($logItem);
+        return !$this->matcher instanceof LogMatcherInterface || $this->matcher->matches($logItem);
     }
 
     public function addDriver(LogDriverInterface $driver, ?LogMatcherInterface $matcher = null): void

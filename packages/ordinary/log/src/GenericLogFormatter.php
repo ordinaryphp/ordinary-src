@@ -14,12 +14,12 @@ namespace Ordinary\Log;
  * in context — including {@see LogItemInterface::RESERVED_EXCEPTION} — is
  * formatted with full detail; otherwise the fallback is "ClassName: message".
  */
-final class GenericLogFormatter implements LogFormatterInterface
+final readonly class GenericLogFormatter implements LogFormatterInterface
 {
     public function __construct(
-        private readonly DateTimeFormatterInterface $dateTimeFormatter = new GenericDateTimeFormatter(),
-        private readonly LevelFormatterInterface $levelFormatter = new GenericLevelFormatter(),
-        private readonly ?ExceptionFormatterInterface $exceptionFormatter = null,
+        private DateTimeFormatterInterface $dateTimeFormatter = new GenericDateTimeFormatter(),
+        private LevelFormatterInterface $levelFormatter = new GenericLevelFormatter(),
+        private ?ExceptionFormatterInterface $exceptionFormatter = null,
     ) {}
 
     public function formatLog(LogItemInterface $logItem): string
@@ -47,7 +47,7 @@ final class GenericLogFormatter implements LogFormatterInterface
     private function stringify(mixed $value): string
     {
         if ($value instanceof \Throwable) {
-            return $this->exceptionFormatter !== null
+            return $this->exceptionFormatter instanceof ExceptionFormatterInterface
                 ? $this->exceptionFormatter->formatException($value)
                 : \sprintf('%s: %s', $value::class, $value->getMessage());
         }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ordinary\Log\FailureHandler;
 
+use Ordinary\Log\LogDriverInterface;
 use Ordinary\Log\LogFailureExceptionInterface;
 use Ordinary\Log\LogFailureHandlerInterface;
 
@@ -22,7 +23,7 @@ final class ErrorLogFailureHandler implements LogFailureHandlerInterface
 
         \error_log(\sprintf(
             'Log driver failure%s for [%s] "%s": %s',
-            $driver !== null ? ' (' . $driver::class . ')' : '',
+            $driver instanceof LogDriverInterface ? ' (' . $driver::class . ')' : '',
             $e->getLogItem()->level->getFullName(),
             $e->getLogItem()->message,
             $e->getPrevious()?->getMessage() ?? $e->getMessage(),

@@ -24,7 +24,7 @@ final class SyslogFailureHandlerTest extends TestCase
             new \RuntimeException('fail'),
         );
 
-        (new SyslogFailureHandler())->handleLogFailure($e);
+        new SyslogFailureHandler()->handleLogFailure($e);
         $this->addToAssertionCount(1);
     }
 }

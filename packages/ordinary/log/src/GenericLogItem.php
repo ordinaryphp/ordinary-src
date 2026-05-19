@@ -7,16 +7,16 @@ namespace Ordinary\Log;
 use DateTimeInterface;
 use InvalidArgumentException;
 
-final class GenericLogItem implements ImmutableLogItemInterface
+final readonly class GenericLogItem implements ImmutableLogItemInterface
 {
     /**
      * @param array<string, mixed> $context
      */
     public function __construct(
-        public readonly LogLevel $level,
-        public readonly string $message,
-        public readonly DateTimeInterface $dateTime,
-        public readonly array $context = [],
+        public LogLevel $level,
+        public string $message,
+        public DateTimeInterface $dateTime,
+        public array $context = [],
     ) {}
 
     public function withLevel(LogLevel $level): static

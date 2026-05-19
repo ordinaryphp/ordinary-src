@@ -13,13 +13,13 @@ namespace Ordinary\Log;
  * top-level `"exception"` field. The original message template is preserved without
  * interpolation so log aggregators receive both the template and the full context.
  */
-final class JsonLogFormatter implements LogFormatterInterface
+final readonly class JsonLogFormatter implements LogFormatterInterface
 {
     public function __construct(
-        private readonly DateTimeFormatterInterface $dateTimeFormatter = new GenericDateTimeFormatter(),
-        private readonly LevelFormatterInterface $levelFormatter = new GenericLevelFormatter(),
-        private readonly ?ExceptionFormatterInterface $exceptionFormatter = null,
-        private readonly int $jsonFlags = \JSON_UNESCAPED_UNICODE | \JSON_UNESCAPED_SLASHES,
+        private DateTimeFormatterInterface $dateTimeFormatter = new GenericDateTimeFormatter(),
+        private LevelFormatterInterface $levelFormatter = new GenericLevelFormatter(),
+        private ?ExceptionFormatterInterface $exceptionFormatter = null,
+        private int $jsonFlags = \JSON_UNESCAPED_UNICODE | \JSON_UNESCAPED_SLASHES,
     ) {}
 
     public function formatLog(LogItemInterface $logItem): string
@@ -66,7 +66,7 @@ final class JsonLogFormatter implements LogFormatterInterface
             return null;
         }
 
-        return $this->exceptionFormatter !== null
+        return $this->exceptionFormatter instanceof ExceptionFormatterInterface
             ? $this->exceptionFormatter->formatException($value)
             : \sprintf('%s: %s', $value::class, $value->getMessage());
     }
@@ -109,7 +109,7 @@ final class JsonLogFormatter implements LogFormatterInterface
         }
 
         if ($value instanceof \Throwable) {
-            return $this->exceptionFormatter !== null
+            return $this->exceptionFormatter instanceof ExceptionFormatterInterface
                 ? $this->exceptionFormatter->formatException($value)
                 : \sprintf('%s: %s', $value::class, $value->getMessage());
         }

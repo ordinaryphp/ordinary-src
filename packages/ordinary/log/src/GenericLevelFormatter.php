@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Ordinary\Log;
 
-final class GenericLevelFormatter implements LevelFormatterInterface
+final readonly class GenericLevelFormatter implements LevelFormatterInterface
 {
     public function __construct(
-        private readonly bool $uppercase = false,
+        private bool $uppercase = false,
     ) {}
 
     public function formatLevel(LogLevel $logLevel): string

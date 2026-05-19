@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Ordinary\Log\Tests\FailureHandler;
 
+use Ordinary\Log\LogDriverInterface;
 use DateTimeImmutable;
-use Ordinary\Log\Driver\StreamDriver;
 use Ordinary\Log\FailureHandler\ErrorLogFailureHandler;
 use Ordinary\Log\GenericLogItem;
 use Ordinary\Log\LogFailureException;
@@ -30,7 +30,7 @@ final class ErrorLogFailureHandlerTest extends TestCase
                 new \RuntimeException('fail'),
             );
 
-            (new ErrorLogFailureHandler())->handleLogFailure($e);
+            new ErrorLogFailureHandler()->handleLogFailure($e);
             $this->addToAssertionCount(1);
         } finally {
             \ini_set('error_log', $previousErrorLog !== false ? $previousErrorLog : '');
@@ -50,11 +50,11 @@ final class ErrorLogFailureHandlerTest extends TestCase
             $stream = \fopen('php://memory', 'w+');
             $this->assertNotFalse($stream);
 
-            $driver = $this->createStub(\Ordinary\Log\LogDriverInterface::class);
+            $driver = $this->createStub(LogDriverInterface::class);
             $logItem = new GenericLogItem(LogLevel::Error, 'connection lost', new DateTimeImmutable());
             $e = new LogFailureException($logItem, new \RuntimeException('timeout'), $driver);
 
-            (new ErrorLogFailureHandler())->handleLogFailure($e);
+            new ErrorLogFailureHandler()->handleLogFailure($e);
 
             $contents = \file_get_contents($tmpFile);
             $this->assertIsString($contents);

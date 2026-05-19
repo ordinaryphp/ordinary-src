@@ -22,13 +22,13 @@ use Ordinary\Log\LogItemInterface;
  * composer require aws/aws-sdk-php
  * ```
  */
-final class CloudWatchDriver implements LogDriverInterface
+final readonly class CloudWatchDriver implements LogDriverInterface
 {
     public function __construct(
-        private readonly CloudWatchLogsClient $client,
-        private readonly string $logGroupName,
-        private readonly string $logStreamName,
-        private readonly LogFormatterInterface $formatter = new JsonLogFormatter(),
+        private CloudWatchLogsClient $client,
+        private string $logGroupName,
+        private string $logStreamName,
+        private LogFormatterInterface $formatter = new JsonLogFormatter(),
     ) {}
 
     public function handleLog(LogItemInterface $logItem): void

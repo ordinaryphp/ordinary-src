@@ -39,19 +39,17 @@ final class LogLevelTest extends TestCase
         $this->assertSame('deb', LogLevel::Debug->getShortestIdentifiablePrefix());
     }
 
-    /** @return array<string, array{string, LogLevel}> */
-    public static function full_name_provider(): array
+    /** @return \Iterator<string, array{string, LogLevel}> */
+    public static function full_name_provider(): \Iterator
     {
-        return [
-            'emergency' => ['emergency', LogLevel::Emergency],
-            'alert' => ['alert', LogLevel::Alert],
-            'critical' => ['critical', LogLevel::Critical],
-            'error' => ['error', LogLevel::Error],
-            'warning' => ['warning', LogLevel::Warning],
-            'notice' => ['notice', LogLevel::Notice],
-            'info' => ['info', LogLevel::Info],
-            'debug' => ['debug', LogLevel::Debug],
-        ];
+        yield 'emergency' => ['emergency', LogLevel::Emergency];
+        yield 'alert' => ['alert', LogLevel::Alert];
+        yield 'critical' => ['critical', LogLevel::Critical];
+        yield 'error' => ['error', LogLevel::Error];
+        yield 'warning' => ['warning', LogLevel::Warning];
+        yield 'notice' => ['notice', LogLevel::Notice];
+        yield 'info' => ['info', LogLevel::Info];
+        yield 'debug' => ['debug', LogLevel::Debug];
     }
 
     #[Test]
@@ -69,26 +67,24 @@ final class LogLevelTest extends TestCase
         $this->assertSame(LogLevel::Debug, LogLevel::fromString('  DEBUG  '));
     }
 
-    /** @return array<string, array{string, LogLevel}> */
-    public static function prefix_provider(): array
+    /** @return \Iterator<string, array{string, LogLevel}> */
+    public static function prefix_provider(): \Iterator
     {
-        return [
-            'emer' => ['emer', LogLevel::Emergency],
-            'emerg' => ['emerg', LogLevel::Emergency],
-            'aler' => ['aler', LogLevel::Alert],
-            'alert' => ['alert', LogLevel::Alert],
-            'crit' => ['crit', LogLevel::Critical],
-            'criti' => ['criti', LogLevel::Critical],
-            'err' => ['err', LogLevel::Error],
-            'erro' => ['erro', LogLevel::Error],
-            'warn' => ['warn', LogLevel::Warning],
-            'warni' => ['warni', LogLevel::Warning],
-            'noti' => ['noti', LogLevel::Notice],
-            'notic' => ['notic', LogLevel::Notice],
-            'info' => ['info', LogLevel::Info],
-            'deb' => ['deb', LogLevel::Debug],
-            'debu' => ['debu', LogLevel::Debug],
-        ];
+        yield 'emer' => ['emer', LogLevel::Emergency];
+        yield 'emerg' => ['emerg', LogLevel::Emergency];
+        yield 'aler' => ['aler', LogLevel::Alert];
+        yield 'alert' => ['alert', LogLevel::Alert];
+        yield 'crit' => ['crit', LogLevel::Critical];
+        yield 'criti' => ['criti', LogLevel::Critical];
+        yield 'err' => ['err', LogLevel::Error];
+        yield 'erro' => ['erro', LogLevel::Error];
+        yield 'warn' => ['warn', LogLevel::Warning];
+        yield 'warni' => ['warni', LogLevel::Warning];
+        yield 'noti' => ['noti', LogLevel::Notice];
+        yield 'notic' => ['notic', LogLevel::Notice];
+        yield 'info' => ['info', LogLevel::Info];
+        yield 'deb' => ['deb', LogLevel::Debug];
+        yield 'debu' => ['debu', LogLevel::Debug];
     }
 
     #[Test]
@@ -98,17 +94,15 @@ final class LogLevelTest extends TestCase
         $this->assertSame($expected, LogLevel::fromString($input));
     }
 
-    /** @return array<string, array{string}> */
-    public static function invalid_input_provider(): array
+    /** @return \Iterator<string, array{string}> */
+    public static function invalid_input_provider(): \Iterator
     {
-        return [
-            'empty' => [''],
-            'too short for any prefix' => ['e'],
-            'below minimum prefix for error' => ['er'],
-            'unknown level' => ['verbose'],
-            'partial below min prefix' => ['war'],
-            'partial below min prefix 2' => ['no'],
-        ];
+        yield 'empty' => [''];
+        yield 'too short for any prefix' => ['e'];
+        yield 'below minimum prefix for error' => ['er'];
+        yield 'unknown level' => ['verbose'];
+        yield 'partial below min prefix' => ['war'];
+        yield 'partial below min prefix 2' => ['no'];
     }
 
     #[Test]

@@ -76,7 +76,7 @@ final class GenericLogFormatterTest extends TestCase
         );
 
         $exception = new \RuntimeException('something broke');
-        $item = (new GenericLogItem(LogLevel::Error, '{@exception}', new DateTimeImmutable()))
+        $item = new GenericLogItem(LogLevel::Error, '{@exception}', new DateTimeImmutable())
             ->withReservedContext([LogItemInterface::RESERVED_EXCEPTION => $exception]);
 
         $result = $formatter->formatLog($item);

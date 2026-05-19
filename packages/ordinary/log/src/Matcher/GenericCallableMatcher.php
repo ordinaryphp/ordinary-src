@@ -18,10 +18,10 @@ use Ordinary\Log\LogMatcherInterface;
  * ));
  * ```
  */
-final class GenericCallableMatcher implements LogMatcherInterface
+final readonly class GenericCallableMatcher implements LogMatcherInterface
 {
     /** @param \Closure(LogItemInterface): bool $matcher */
-    public function __construct(private readonly \Closure $matcher) {}
+    public function __construct(private \Closure $matcher) {}
 
     public function matches(LogItemInterface $logItem): bool
     {

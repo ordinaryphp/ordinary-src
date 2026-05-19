@@ -7,9 +7,9 @@ namespace Ordinary\Log\Matcher;
 use Ordinary\Log\LogItemInterface;
 use Ordinary\Log\LogMatcherInterface;
 
-final class IsNot implements LogMatcherInterface
+final readonly class IsNot implements LogMatcherInterface
 {
-    public function __construct(private readonly LogMatcherInterface $matcher) {}
+    public function __construct(private LogMatcherInterface $matcher) {}
 
     public function matches(LogItemInterface $logItem): bool
     {

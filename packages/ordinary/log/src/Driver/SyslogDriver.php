@@ -24,10 +24,10 @@ use Ordinary\Log\SynchronousDriverInterface;
  * $logger->add(new SyslogDriver(ident: 'my-app'));
  * ```
  */
-final class SyslogDriver implements SynchronousDriverInterface
+final readonly class SyslogDriver implements SynchronousDriverInterface
 {
     public function __construct(
-        private readonly LogFormatterInterface $formatter = new GenericLogFormatter(),
+        private LogFormatterInterface $formatter = new GenericLogFormatter(),
         string $ident = '',
         int $facility = \LOG_USER,
         int $option = 0,

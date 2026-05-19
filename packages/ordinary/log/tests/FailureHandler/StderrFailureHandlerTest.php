@@ -28,7 +28,7 @@ final class StderrFailureHandlerTest extends TestCase
         $logItem = new GenericLogItem(LogLevel::Error, 'something failed', new DateTimeImmutable());
         $e = new LogFailureException($logItem, new \RuntimeException('network timeout'));
 
-        (new StderrFailureHandler($stream))->handleLogFailure($e);
+        new StderrFailureHandler($stream)->handleLogFailure($e);
 
         \rewind($stream);
         $output = \stream_get_contents($stream);

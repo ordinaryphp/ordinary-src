@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Ordinary\Log\Tests;
 
-use DateTimeImmutable;
 use Ordinary\Log\FailureHandler\NoOpFailureHandler;
 use Ordinary\Log\GenericCallableProcessor;
 use Ordinary\Log\LogDriverInterface;
@@ -272,7 +271,7 @@ final class LoggerTest extends TestCase
         $logger->add($driver);
         $logger->error('charge failed');
 
-        $this->assertNotNull($capturedItem);
+        $this->assertInstanceOf(LogItemInterface::class, $capturedItem);
         $this->assertSame('payment', $capturedItem->context[LogItemInterface::RESERVED_CHANNEL]);
     }
 
@@ -290,7 +289,7 @@ final class LoggerTest extends TestCase
         $logger->add($driver);
         $logger->info('test');
 
-        $this->assertNotNull($capturedItem);
+        $this->assertInstanceOf(LogItemInterface::class, $capturedItem);
         $this->assertArrayNotHasKey(LogItemInterface::RESERVED_CHANNEL, $capturedItem->context);
     }
 
@@ -306,12 +305,12 @@ final class LoggerTest extends TestCase
 
         $logger = new Logger(onFailure: new NoOpFailureHandler());
         $logger->addProcessor(new GenericCallableProcessor(
-            fn(ImmutableLogItemInterface $item) => $item->withContext(['enriched' => true]),
+            fn(ImmutableLogItemInterface $item): ImmutableLogItemInterface => $item->withContext(['enriched' => true]),
         ));
         $logger->add($driver);
         $logger->info('test');
 
-        $this->assertNotNull($capturedItem);
+        $this->assertInstanceOf(LogItemInterface::class, $capturedItem);
         $this->assertTrue($capturedItem->context['enriched']);
     }
 

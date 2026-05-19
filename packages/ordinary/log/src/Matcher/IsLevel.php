@@ -8,10 +8,10 @@ use Ordinary\Log\LogItemInterface;
 use Ordinary\Log\LogLevel;
 use Ordinary\Log\LogMatcherInterface;
 
-final class IsLevel implements LogMatcherInterface
+final readonly class IsLevel implements LogMatcherInterface
 {
     /** @var list<LogLevel> */
-    private readonly array $levels;
+    private array $levels;
 
     public function __construct(LogLevel ...$levels)
     {
@@ -20,12 +20,6 @@ final class IsLevel implements LogMatcherInterface
 
     public function matches(LogItemInterface $logItem): bool
     {
-        foreach ($this->levels as $level) {
-            if ($logItem->level->isSameAs($level)) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any($this->levels, fn(LogLevel $level): bool => $logItem->level->isSameAs($level));
     }
 }

@@ -78,7 +78,7 @@ final class JsonLogFormatterTest extends TestCase
     public function it_extracts_exception_to_top_level_field(): void
     {
         $e = new \RuntimeException('boom');
-        $item = (new GenericLogItem(LogLevel::Error, 'Error occurred', new DateTimeImmutable()))
+        $item = new GenericLogItem(LogLevel::Error, 'Error occurred', new DateTimeImmutable())
             ->withReservedContext([LogItemInterface::RESERVED_EXCEPTION => $e]);
 
         $data = $this->decode($this->formatter->formatLog($item));
@@ -99,12 +99,12 @@ final class JsonLogFormatterTest extends TestCase
         );
 
         $e = new \RuntimeException('detailed', 99);
-        $item = (new GenericLogItem(LogLevel::Error, 'Error', new DateTimeImmutable()))
+        $item = new GenericLogItem(LogLevel::Error, 'Error', new DateTimeImmutable())
             ->withReservedContext([LogItemInterface::RESERVED_EXCEPTION => $e]);
 
         $data = $this->decode($formatter->formatLog($item));
 
-        $this->assertStringContainsString('code 99', $data['exception']);
+        $this->assertStringContainsString('code 99', (string) $data['exception']);
     }
 
     #[Test]
@@ -161,13 +161,13 @@ final class JsonLogFormatterTest extends TestCase
     #[Test]
     public function it_extracts_channel_as_first_top_level_field(): void
     {
-        $item = (new GenericLogItem(LogLevel::Info, 'msg', new DateTimeImmutable()))
+        $item = new GenericLogItem(LogLevel::Info, 'msg', new DateTimeImmutable())
             ->withReservedContext([LogItemInterface::RESERVED_CHANNEL => 'payment']);
 
         $data = $this->decode($this->formatter->formatLog($item));
 
         $this->assertSame('payment', $data['channel']);
-        $this->assertSame(\array_key_first($data), 'channel');
+        $this->assertSame('channel', \array_key_first($data));
         $this->assertArrayNotHasKey(LogItemInterface::RESERVED_CHANNEL, $data['context']);
     }
 

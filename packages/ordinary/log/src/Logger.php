@@ -114,7 +114,6 @@ final class Logger implements LoggerInterface
     /**
      * Registers a driver with a group.
      *
-     * @param LogDriverInterface $driver
      * @param LogMatcherInterface|null $matcher
      *        Applied after the group matcher. The driver only receives items
      *        that pass both the group matcher AND this matcher.
@@ -168,14 +167,14 @@ final class Logger implements LoggerInterface
         $operation = function () use ($driver, $logItem): void {
             try {
                 $driver->handleLog($logItem);
-            } catch (\Throwable $e) {
+            } catch (\Throwable $throwable) {
                 $this->onFailure->handleLogFailure(
-                    new LogFailureException($logItem, $e, $driver),
+                    new LogFailureException($logItem, $throwable, $driver),
                 );
             }
         };
 
-        if ($this->dispatcher !== null && !($driver instanceof SynchronousDriverInterface)) {
+        if ($this->dispatcher instanceof \Closure && !($driver instanceof SynchronousDriverInterface)) {
             ($this->dispatcher)($operation);
         } else {
             $operation();

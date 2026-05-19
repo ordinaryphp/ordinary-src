@@ -64,7 +64,7 @@ final class GenericCallableProcessorTest extends TestCase
         $item = new GenericLogItem(LogLevel::Info, 'msg', new DateTimeImmutable());
 
         $processor = new GenericCallableProcessor(
-            fn(ImmutableLogItemInterface $i) => $i->withContext(['enriched' => true]),
+            fn(ImmutableLogItemInterface $i): ImmutableLogItemInterface => $i->withContext(['enriched' => true]),
         );
 
         $result = $processor->process($item);
@@ -79,7 +79,7 @@ final class GenericCallableProcessorTest extends TestCase
         $item = new GenericLogItem(LogLevel::Info, 'original', new DateTimeImmutable());
 
         $processor = new GenericCallableProcessor(
-            fn(ImmutableLogItemInterface $i) => $i->withLevel(LogLevel::Error)->withMessage('replaced'),
+            fn(ImmutableLogItemInterface $i): ImmutableLogItemInterface => $i->withLevel(LogLevel::Error)->withMessage('replaced'),
         );
 
         $result = $processor->process($item);

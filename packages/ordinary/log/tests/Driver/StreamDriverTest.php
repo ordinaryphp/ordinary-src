@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ordinary\Log\Tests\Driver;
 
+use Ordinary\Log\LogFormatterInterface;
 use DateTimeImmutable;
 use Ordinary\Log\Driver\StreamDriver;
 use Ordinary\Log\GenericDateTimeFormatter;
@@ -90,7 +91,7 @@ final class StreamDriverTest extends TestCase
         $stream = \fopen('php://memory', 'w+');
         $this->assertNotFalse($stream);
 
-        $formatter = $this->createStub(\Ordinary\Log\LogFormatterInterface::class);
+        $formatter = $this->createStub(LogFormatterInterface::class);
         $formatter->method('formatLog')->willThrowException(new \RuntimeException('format failed'));
 
         $driver = new StreamDriver($stream, $formatter);
