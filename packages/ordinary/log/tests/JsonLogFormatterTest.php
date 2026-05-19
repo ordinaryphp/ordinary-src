@@ -159,6 +159,29 @@ final class JsonLogFormatterTest extends TestCase
     }
 
     #[Test]
+    public function it_extracts_channel_as_first_top_level_field(): void
+    {
+        $item = (new GenericLogItem(LogLevel::Info, 'msg', new DateTimeImmutable()))
+            ->withReservedContext([LogItemInterface::RESERVED_CHANNEL => 'payment']);
+
+        $data = $this->decode($this->formatter->formatLog($item));
+
+        $this->assertSame('payment', $data['channel']);
+        $this->assertSame(\array_key_first($data), 'channel');
+        $this->assertArrayNotHasKey(LogItemInterface::RESERVED_CHANNEL, $data['context']);
+    }
+
+    #[Test]
+    public function it_omits_channel_field_when_not_set(): void
+    {
+        $item = new GenericLogItem(LogLevel::Info, 'msg', new DateTimeImmutable());
+
+        $data = $this->decode($this->formatter->formatLog($item));
+
+        $this->assertArrayNotHasKey('channel', $data);
+    }
+
+    #[Test]
     public function it_normalizes_stringable_object(): void
     {
         $obj = new class implements \Stringable {

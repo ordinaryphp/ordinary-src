@@ -16,9 +16,12 @@ use Ordinary\Log\Internal\LogGroup;
  * Drivers added without specifying a group land in `default`.
  *
  * ```php
- * $logger = new Logger();
+ * $logger = new Logger(channel: 'payment');
+ * $logger->addProcessor(new GenericCallableProcessor(
+ *     fn(ImmutableLogItemInterface $item) => $item->withContext(['request_id' => $requestId]),
+ * ));
  * $logger->add(new StreamDriver(STDOUT, new JsonLogFormatter()));
- * $logger->info('Application started');
+ * $logger->info('Charge processed', ['amount' => 99.00]);
  * ```
  */
 final class Logger implements LoggerInterface
@@ -30,7 +33,15 @@ final class Logger implements LoggerInterface
     /** @var array<string, LogGroup> */
     private array $groups = [];
 
+    /** @var list<LogProcessorInterface> */
+    private array $processors = [];
+
     /**
+     * @param string $channel
+     *        Optional channel name stamped on every log item before dispatch and
+     *        processors run. Appears as a top-level `"channel"` field in
+     *        {@see \Ordinary\Log\JsonLogFormatter} output and as the `{@channel}`
+     *        placeholder in {@see \Ordinary\Log\GenericLogFormatter}.
      * @param null|\Closure(\Closure(): void): void $dispatcher
      *        When provided, each driver call is passed to this closure as a
      *        zero-argument operation. Use this to queue writes onto an event
@@ -42,10 +53,23 @@ final class Logger implements LoggerInterface
      *        {@see \Ordinary\Log\FailureHandler\NoOpFailureHandler} to silence failures.
      */
     public function __construct(
+        public readonly string $channel = '',
         private readonly ?\Closure $dispatcher = null,
         private readonly LogFailureHandlerInterface $onFailure = new ErrorLogFailureHandler(),
     ) {
         $this->groups[self::DEFAULT_GROUP] = new LogGroup(self::DEFAULT_GROUP);
+    }
+
+    /**
+     * Registers a processor that transforms every log item before dispatch.
+     *
+     * Processors run in registration order after the channel is stamped and
+     * before group/driver matching begins. Use {@see GenericCallableProcessor}
+     * to wrap an inline closure.
+     */
+    public function addProcessor(LogProcessorInterface $processor): void
+    {
+        $this->processors[] = $processor;
     }
 
     /**
@@ -114,6 +138,16 @@ final class Logger implements LoggerInterface
 
     public function log(LogItemInterface $logItem): void
     {
+        if ($this->channel !== '') {
+            $context = $logItem->context;
+            $context[LogItemInterface::RESERVED_CHANNEL] = $this->channel;
+            $logItem = new GenericLogItem($logItem->level, $logItem->message, $logItem->dateTime, $context);
+        }
+
+        foreach ($this->processors as $processor) {
+            $logItem = $processor->process($logItem);
+        }
+
         foreach ($this->groups as $group) {
             if (!$group->matches($logItem)) {
                 continue;

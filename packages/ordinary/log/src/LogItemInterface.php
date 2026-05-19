@@ -49,6 +49,13 @@ interface LogItemInterface
      */
     public const string RESERVED_EXCEPTION_CODE = '@exception.code';
 
+    /**
+     * Reserved context key stamped by {@see \Ordinary\Log\Logger} when a channel name
+     * is configured. Formatters expose it as a top-level field or `{@channel}` placeholder.
+     * Must not appear in user-supplied context.
+     */
+    public const string RESERVED_CHANNEL = '@channel';
+
     public const array RESERVED_KEYS = [
         self::RESERVED_DATE,
         self::RESERVED_LEVEL,
@@ -56,6 +63,7 @@ interface LogItemInterface
         self::RESERVED_EXCEPTION_MESSAGE,
         self::RESERVED_EXCEPTION_LINE,
         self::RESERVED_EXCEPTION_CODE,
+        self::RESERVED_CHANNEL,
     ];
 
     public LogLevel $level { get; }
@@ -69,11 +77,13 @@ interface LogItemInterface
      *
      * {@see self::RESERVED_DATE}, {@see self::RESERVED_LEVEL},
      * {@see self::RESERVED_EXCEPTION_MESSAGE}, {@see self::RESERVED_EXCEPTION_LINE},
-     * and {@see self::RESERVED_EXCEPTION_CODE} are prohibited from user-supplied context —
-     * they are injected by formatters at write time.
+     * {@see self::RESERVED_EXCEPTION_CODE}, and {@see self::RESERVED_CHANNEL} are
+     * prohibited from user-supplied context — they are injected by the Logger or
+     * formatters at dispatch/write time.
      * {@see self::RESERVED_EXCEPTION} may be set by callers to attach a Throwable.
      *
      * @var array<string, mixed>
      */
     public array $context { get; }
+
 }

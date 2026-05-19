@@ -7,11 +7,11 @@ namespace Ordinary\Log;
 /**
  * Produces a JSON-encoded log entry with structured fields.
  *
- * The {@see LogItemInterface::RESERVED_EXCEPTION} context key, when present and
- * holding a Throwable, is extracted and placed as a top-level "exception" field
- * using the supplied exception formatter. The original message template is
- * preserved without interpolation so log aggregators receive both the template
- * and the full context structure.
+ * When a channel is set on the {@see \Ordinary\Log\Logger}, it appears as the
+ * first top-level `"channel"` field. The {@see LogItemInterface::RESERVED_EXCEPTION}
+ * context key, when present and holding a Throwable, is extracted and placed as a
+ * top-level `"exception"` field. The original message template is preserved without
+ * interpolation so log aggregators receive both the template and the full context.
  */
 final class JsonLogFormatter implements LogFormatterInterface
 {
@@ -26,14 +26,20 @@ final class JsonLogFormatter implements LogFormatterInterface
     {
         $context = $logItem->context;
 
+        $channelField = $context[LogItemInterface::RESERVED_CHANNEL] ?? null;
+        unset($context[LogItemInterface::RESERVED_CHANNEL]);
         $exceptionField = $this->extractException($context);
 
-        $data = [
-            'level' => $this->levelFormatter->formatLevel($logItem->level),
-            'date' => $this->dateTimeFormatter->formatDate($logItem->dateTime),
-            'message' => $logItem->message,
-            'context' => $this->normalizeContext($context),
-        ];
+        $data = [];
+
+        if ($channelField !== null) {
+            $data['channel'] = $channelField;
+        }
+
+        $data['level'] = $this->levelFormatter->formatLevel($logItem->level);
+        $data['date'] = $this->dateTimeFormatter->formatDate($logItem->dateTime);
+        $data['message'] = $logItem->message;
+        $data['context'] = $this->normalizeContext($context);
 
         if ($exceptionField !== null) {
             $data['exception'] = $exceptionField;

@@ -42,6 +42,26 @@ final class CloudWatchDriverTest extends TestCase
     }
 
     #[Test]
+    public function it_uses_json_log_formatter_by_default(): void
+    {
+        $client = $this->makeClient();
+
+        $client->expects($this->once())
+            ->method('__call')
+            ->with('putLogEvents', $this->callback(function (array $argsList): bool {
+                $event = $argsList[0]['logEvents'][0];
+                $decoded = \json_decode($event['message'], true);
+                $this->assertIsArray($decoded);
+                $this->assertArrayHasKey('level', $decoded);
+                $this->assertArrayHasKey('message', $decoded);
+                return true;
+            }));
+
+        $driver = new CloudWatchDriver($client, 'g', 's');
+        $driver->handleLog(new GenericLogItem(LogLevel::Info, 'default formatter test', new DateTimeImmutable()));
+    }
+
+    #[Test]
     public function it_calls_put_log_events_with_correct_structure(): void
     {
         $client = $this->makeClient();

@@ -68,6 +68,23 @@ final class StreamDriverTest extends TestCase
     }
 
     #[Test]
+    public function it_uses_generic_log_formatter_by_default(): void
+    {
+        $stream = \fopen('php://memory', 'w+');
+        $this->assertNotFalse($stream);
+
+        $driver = new StreamDriver($stream);
+        $driver->handleLog(new GenericLogItem(LogLevel::Info, 'default formatter test', new DateTimeImmutable()));
+
+        \rewind($stream);
+        $output = \stream_get_contents($stream);
+        \fclose($stream);
+
+        $this->assertIsString($output);
+        $this->assertStringContainsString('default formatter test', $output);
+    }
+
+    #[Test]
     public function it_propagates_exceptions_from_formatter(): void
     {
         $stream = \fopen('php://memory', 'w+');

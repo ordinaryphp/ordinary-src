@@ -7,7 +7,7 @@ namespace Ordinary\Log;
 use DateTimeInterface;
 use InvalidArgumentException;
 
-final class GenericLogItem implements LogItemInterface
+final class GenericLogItem implements ImmutableLogItemInterface
 {
     /**
      * @param array<string, mixed> $context
@@ -19,6 +19,21 @@ final class GenericLogItem implements LogItemInterface
         public readonly array $context = [],
     ) {}
 
+    public function withLevel(LogLevel $level): static
+    {
+        return clone($this, ['level' => $level]);
+    }
+
+    public function withMessage(string $message): static
+    {
+        return clone($this, ['message' => $message]);
+    }
+
+    public function withDateTime(DateTimeInterface $dateTime): static
+    {
+        return clone($this, ['dateTime' => $dateTime]);
+    }
+
     /**
      * Returns a new instance with the given user-context entries merged in.
      *
@@ -28,7 +43,7 @@ final class GenericLogItem implements LogItemInterface
      *
      * @throws InvalidArgumentException when $context contains any reserved key
      */
-    public function withContext(array $context): self
+    public function withContext(array $context): static
     {
         foreach (self::RESERVED_KEYS as $key) {
             if (\array_key_exists($key, $context)) {
@@ -50,7 +65,7 @@ final class GenericLogItem implements LogItemInterface
      *
      * @throws InvalidArgumentException when $context contains a non-reserved key
      */
-    public function withReservedContext(array $context): self
+    public function withReservedContext(array $context): static
     {
         foreach (\array_keys($context) as $key) {
             if (!\in_array($key, self::RESERVED_KEYS, true)) {
@@ -62,4 +77,5 @@ final class GenericLogItem implements LogItemInterface
 
         return clone($this, ['context' => \array_merge($this->context, $context)]);
     }
+
 }

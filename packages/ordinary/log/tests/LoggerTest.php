@@ -6,11 +6,13 @@ namespace Ordinary\Log\Tests;
 
 use DateTimeImmutable;
 use Ordinary\Log\FailureHandler\NoOpFailureHandler;
-use Ordinary\Log\GenericLogItem;
+use Ordinary\Log\GenericCallableProcessor;
 use Ordinary\Log\LogDriverInterface;
+use Ordinary\Log\ImmutableLogItemInterface;
 use Ordinary\Log\LogFailureExceptionInterface;
 use Ordinary\Log\LogFailureHandlerInterface;
 use Ordinary\Log\LogItemInterface;
+use Ordinary\Log\LogProcessorInterface;
 use Ordinary\Log\LogLevel;
 use Ordinary\Log\Logger;
 use Ordinary\Log\Matcher\IsLevelOrHigher;
@@ -254,6 +256,113 @@ final class LoggerTest extends TestCase
         $logger->add($failing);
         $logger->add($succeeding);
         $logger->error('test');
+    }
+
+    #[Test]
+    public function it_stamps_channel_on_every_log_item(): void
+    {
+        $capturedItem = null;
+
+        $driver = $this->createStub(LogDriverInterface::class);
+        $driver->method('handleLog')->willReturnCallback(function (LogItemInterface $item) use (&$capturedItem): void {
+            $capturedItem = $item;
+        });
+
+        $logger = new Logger(channel: 'payment', onFailure: new NoOpFailureHandler());
+        $logger->add($driver);
+        $logger->error('charge failed');
+
+        $this->assertNotNull($capturedItem);
+        $this->assertSame('payment', $capturedItem->context[LogItemInterface::RESERVED_CHANNEL]);
+    }
+
+    #[Test]
+    public function it_does_not_stamp_channel_when_empty(): void
+    {
+        $capturedItem = null;
+
+        $driver = $this->createStub(LogDriverInterface::class);
+        $driver->method('handleLog')->willReturnCallback(function (LogItemInterface $item) use (&$capturedItem): void {
+            $capturedItem = $item;
+        });
+
+        $logger = new Logger(onFailure: new NoOpFailureHandler());
+        $logger->add($driver);
+        $logger->info('test');
+
+        $this->assertNotNull($capturedItem);
+        $this->assertArrayNotHasKey(LogItemInterface::RESERVED_CHANNEL, $capturedItem->context);
+    }
+
+    #[Test]
+    public function it_applies_processor_before_dispatch(): void
+    {
+        $capturedItem = null;
+
+        $driver = $this->createStub(LogDriverInterface::class);
+        $driver->method('handleLog')->willReturnCallback(function (LogItemInterface $item) use (&$capturedItem): void {
+            $capturedItem = $item;
+        });
+
+        $logger = new Logger(onFailure: new NoOpFailureHandler());
+        $logger->addProcessor(new GenericCallableProcessor(
+            fn(ImmutableLogItemInterface $item) => $item->withContext(['enriched' => true]),
+        ));
+        $logger->add($driver);
+        $logger->info('test');
+
+        $this->assertNotNull($capturedItem);
+        $this->assertTrue($capturedItem->context['enriched']);
+    }
+
+    #[Test]
+    public function processors_run_in_registration_order(): void
+    {
+        $order = [];
+
+        $logger = new Logger(onFailure: new NoOpFailureHandler());
+        $logger->addProcessor(new GenericCallableProcessor(function (ImmutableLogItemInterface $item) use (&$order): ImmutableLogItemInterface {
+            $order[] = 'first';
+            return $item;
+        }));
+        $logger->addProcessor(new GenericCallableProcessor(function (ImmutableLogItemInterface $item) use (&$order): ImmutableLogItemInterface {
+            $order[] = 'second';
+            return $item;
+        }));
+        $logger->add($this->createStub(LogDriverInterface::class));
+        $logger->info('test');
+
+        $this->assertSame(['first', 'second'], $order);
+    }
+
+    #[Test]
+    public function processors_can_see_the_channel(): void
+    {
+        $channelSeenByProcessor = null;
+
+        $logger = new Logger(channel: 'app', onFailure: new NoOpFailureHandler());
+        $logger->addProcessor(new GenericCallableProcessor(function (ImmutableLogItemInterface $item) use (&$channelSeenByProcessor): ImmutableLogItemInterface {
+            $channelSeenByProcessor = $item->context[LogItemInterface::RESERVED_CHANNEL] ?? null;
+            return $item;
+        }));
+        $logger->add($this->createStub(LogDriverInterface::class));
+        $logger->info('test');
+
+        $this->assertSame('app', $channelSeenByProcessor);
+    }
+
+    #[Test]
+    public function it_accepts_typed_processor_interface(): void
+    {
+        $processor = $this->createMock(LogProcessorInterface::class);
+        $processor->expects($this->once())
+            ->method('process')
+            ->willReturnArgument(0);
+
+        $logger = new Logger(onFailure: new NoOpFailureHandler());
+        $logger->addProcessor($processor);
+        $logger->add($this->createStub(LogDriverInterface::class));
+        $logger->info('test');
     }
 
     #[Test]
