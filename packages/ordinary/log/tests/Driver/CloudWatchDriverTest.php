@@ -50,8 +50,15 @@ final class CloudWatchDriverTest extends TestCase
         $client->expects($this->once())
             ->method('__call')
             ->with('putLogEvents', $this->callback(function (array $argsList): bool {
-                $event = $argsList[0]['logEvents'][0];
-                $decoded = \json_decode((string) $event['message'], true);
+                $args = $argsList[0];
+                $this->assertIsArray($args);
+                $logEvents = $args['logEvents'];
+                $this->assertIsArray($logEvents);
+                $event = $logEvents[0];
+                $this->assertIsArray($event);
+                $message = $event['message'];
+                $this->assertIsString($message);
+                $decoded = \json_decode($message, true);
                 $this->assertIsArray($decoded);
                 $this->assertArrayHasKey('level', $decoded);
                 $this->assertArrayHasKey('message', $decoded);
@@ -71,11 +78,14 @@ final class CloudWatchDriverTest extends TestCase
             ->method('__call')
             ->with('putLogEvents', $this->callback(function (array $argsList): bool {
                 $args = $argsList[0];
+                $this->assertIsArray($args);
                 $this->assertSame('my-group', $args['logGroupName']);
                 $this->assertSame('my-stream', $args['logStreamName']);
-                $this->assertIsArray($args['logEvents']);
-                $this->assertCount(1, $args['logEvents']);
-                $event = $args['logEvents'][0];
+                $logEvents = $args['logEvents'];
+                $this->assertIsArray($logEvents);
+                $this->assertCount(1, $logEvents);
+                $event = $logEvents[0];
+                $this->assertIsArray($event);
                 $this->assertIsInt($event['timestamp']);
                 $this->assertIsString($event['message']);
                 $this->assertStringContainsString('something failed', $event['message']);
@@ -95,7 +105,11 @@ final class CloudWatchDriverTest extends TestCase
             ->method('__call')
             ->with('putLogEvents', $this->callback(function (array $argsList): bool {
                 $args = $argsList[0];
-                $event = $args['logEvents'][0];
+                $this->assertIsArray($args);
+                $logEvents = $args['logEvents'];
+                $this->assertIsArray($logEvents);
+                $event = $logEvents[0];
+                $this->assertIsArray($event);
                 $this->assertIsInt($event['timestamp']);
                 $this->assertGreaterThan(\time(), $event['timestamp']);
                 return true;

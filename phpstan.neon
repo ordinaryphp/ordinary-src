@@ -1,12 +1,14 @@
 includes:
     - vendor/phpstan/phpstan-strict-rules/rules.neon
+    - vendor/phpstan/phpstan-phpunit/extension.neon
 
 parameters:
     level: max
     paths:
         - packages
     excludePaths:
-        - packages/*/vendor
+        analyse:
+            - packages/*/*/vendor/**
     ignoreErrors:
         -
             message: '#Dynamic call to static method#'

@@ -198,6 +198,7 @@ final class LoggerTest extends TestCase
             $fn();
         }
 
+        // @phpstan-ignore method.impossibleType
         $this->assertSame(1, $callCount);
     }
 
@@ -232,7 +233,7 @@ final class LoggerTest extends TestCase
         $onFailure->expects($this->once())
             ->method('handleLogFailure')
             ->with($this->callback(function (LogFailureExceptionInterface $e) use ($driver): bool {
-                $this->assertSame($driver, $e->getFailingDriver());
+                $this->assertSame($driver, $e->failingDriver);
                 $this->assertStringContainsString('boom', $e->getMessage());
                 return true;
             }));

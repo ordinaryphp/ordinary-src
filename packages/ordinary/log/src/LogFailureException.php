@@ -15,9 +15,9 @@ final class LogFailureException extends \RuntimeException implements LogFailureE
      *                                               The driver that threw. Null only when constructed outside the Logger.
      */
     public function __construct(
-        private readonly LogItemInterface $logItem,
+        public readonly LogItemInterface $logItem,
         \Throwable $previous,
-        private readonly ?LogDriverInterface $failingDriver = null,
+        public readonly ?LogDriverInterface $failingDriver = null,
     ) {
         parent::__construct(
             \sprintf(
@@ -29,15 +29,5 @@ final class LogFailureException extends \RuntimeException implements LogFailureE
             $previous->getCode(),
             $previous,
         );
-    }
-
-    public function getLogItem(): LogItemInterface
-    {
-        return $this->logItem;
-    }
-
-    public function getFailingDriver(): ?LogDriverInterface
-    {
-        return $this->failingDriver;
     }
 }

@@ -15,7 +15,7 @@ final readonly class IsLevel implements LogMatcherInterface
 
     public function __construct(LogLevel ...$levels)
     {
-        $this->levels = $levels;
+        $this->levels = \array_values($levels);
     }
 
     public function matches(LogItemInterface $logItem): bool

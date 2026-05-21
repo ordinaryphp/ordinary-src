@@ -19,10 +19,10 @@ final class IsAnyTest extends TestCase
     #[Test]
     public function it_matches_when_at_least_one_matcher_passes(): void
     {
-        $matcher = new IsAny([
+        $matcher = new IsAny(
             new IsLevel(LogLevel::Debug),
             new IsLevel(LogLevel::Emergency),
-        ]);
+        );
 
         $this->assertTrue($matcher->matches(new GenericLogItem(LogLevel::Debug, 'msg', new DateTimeImmutable())));
         $this->assertTrue($matcher->matches(new GenericLogItem(LogLevel::Emergency, 'msg', new DateTimeImmutable())));
@@ -33,7 +33,7 @@ final class IsAnyTest extends TestCase
     #[Test]
     public function it_never_matches_when_no_matchers_given(): void
     {
-        $matcher = new IsAny([]);
+        $matcher = new IsAny();
 
         $this->assertFalse($matcher->matches(new GenericLogItem(LogLevel::Emergency, 'msg', new DateTimeImmutable())));
     }

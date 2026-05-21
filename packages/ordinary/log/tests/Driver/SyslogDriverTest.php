@@ -19,6 +19,7 @@ final class SyslogDriverTest extends TestCase
     #[Test]
     public function it_implements_synchronous_driver_interface(): void
     {
+        // @phpstan-ignore method.alreadyNarrowedType
         $this->assertInstanceOf(SynchronousDriverInterface::class, new SyslogDriver());
     }
 

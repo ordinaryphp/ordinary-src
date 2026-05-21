@@ -30,56 +30,56 @@ final readonly class PsrLoggerAdapter implements PsrLoggerInterface
         private LoggerInterface $logger,
     ) {}
 
-    /** @param array<string, mixed> $context */
+    /** @param array<mixed> $context */
     public function emergency(\Stringable|string $message, array $context = []): void
     {
         $this->logger->emergency((string) $message, $this->translateContext($context));
     }
 
-    /** @param array<string, mixed> $context */
+    /** @param array<mixed> $context */
     public function alert(\Stringable|string $message, array $context = []): void
     {
         $this->logger->alert((string) $message, $this->translateContext($context));
     }
 
-    /** @param array<string, mixed> $context */
+    /** @param array<mixed> $context */
     public function critical(\Stringable|string $message, array $context = []): void
     {
         $this->logger->critical((string) $message, $this->translateContext($context));
     }
 
-    /** @param array<string, mixed> $context */
+    /** @param array<mixed> $context */
     public function error(\Stringable|string $message, array $context = []): void
     {
         $this->logger->error((string) $message, $this->translateContext($context));
     }
 
-    /** @param array<string, mixed> $context */
+    /** @param array<mixed> $context */
     public function warning(\Stringable|string $message, array $context = []): void
     {
         $this->logger->warning((string) $message, $this->translateContext($context));
     }
 
-    /** @param array<string, mixed> $context */
+    /** @param array<mixed> $context */
     public function notice(\Stringable|string $message, array $context = []): void
     {
         $this->logger->notice((string) $message, $this->translateContext($context));
     }
 
-    /** @param array<string, mixed> $context */
+    /** @param array<mixed> $context */
     public function info(\Stringable|string $message, array $context = []): void
     {
         $this->logger->info((string) $message, $this->translateContext($context));
     }
 
-    /** @param array<string, mixed> $context */
+    /** @param array<mixed> $context */
     public function debug(\Stringable|string $message, array $context = []): void
     {
         $this->logger->debug((string) $message, $this->translateContext($context));
     }
 
     /**
-     * @param array<string, mixed> $context
+     * @param array<mixed> $context
      *
      * @throws \InvalidArgumentException for unrecognised PSR log level strings
      */
@@ -101,12 +101,13 @@ final readonly class PsrLoggerAdapter implements PsrLoggerInterface
      * Only Throwable values are translated; non-Throwable values under "exception" are
      * passed through unchanged so they appear as regular context in the log output.
      *
-     * @param array<string, mixed> $context
+     * @param array<mixed> $context
      *
      * @return array<string, mixed>
      */
     private function translateContext(array $context): array
     {
+        /** @var array<string, mixed> $context */
         if (\array_key_exists('exception', $context) && $context['exception'] instanceof \Throwable) {
             $context[LogItemInterface::RESERVED_EXCEPTION] = $context['exception'];
             unset($context['exception']);

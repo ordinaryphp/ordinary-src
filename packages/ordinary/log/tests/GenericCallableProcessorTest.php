@@ -8,7 +8,6 @@ use DateTimeImmutable;
 use Ordinary\Log\GenericCallableProcessor;
 use Ordinary\Log\GenericLogItem;
 use Ordinary\Log\ImmutableLogItemInterface;
-use Ordinary\Log\LogItemInterface;
 use Ordinary\Log\LogLevel;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
@@ -84,7 +83,6 @@ final class GenericCallableProcessorTest extends TestCase
 
         $result = $processor->process($item);
 
-        $this->assertInstanceOf(LogItemInterface::class, $result);
         $this->assertSame(LogLevel::Error, $result->level);
         $this->assertSame('replaced', $result->message);
         $this->assertSame(LogLevel::Info, $item->level);

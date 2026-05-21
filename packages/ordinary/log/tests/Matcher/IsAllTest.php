@@ -20,10 +20,10 @@ final class IsAllTest extends TestCase
     #[Test]
     public function it_matches_when_all_matchers_pass(): void
     {
-        $matcher = new IsAll([
+        $matcher = new IsAll(
             new IsLevelOrHigher(LogLevel::Warning),
             new IsLevelOrLower(LogLevel::Error),
-        ]);
+        );
 
         $this->assertTrue($matcher->matches(new GenericLogItem(LogLevel::Warning, 'msg', new DateTimeImmutable())));
         $this->assertTrue($matcher->matches(new GenericLogItem(LogLevel::Error, 'msg', new DateTimeImmutable())));
@@ -34,7 +34,7 @@ final class IsAllTest extends TestCase
     #[Test]
     public function it_always_matches_when_no_matchers_given(): void
     {
-        $matcher = new IsAll([]);
+        $matcher = new IsAll();
 
         $this->assertTrue($matcher->matches(new GenericLogItem(LogLevel::Debug, 'msg', new DateTimeImmutable())));
     }

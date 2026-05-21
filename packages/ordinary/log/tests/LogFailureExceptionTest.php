@@ -22,7 +22,7 @@ final class LogFailureExceptionTest extends TestCase
         $logItem = new GenericLogItem(LogLevel::Error, 'something failed', new DateTimeImmutable());
         $e = new LogFailureException($logItem, new \RuntimeException('original'));
 
-        $this->assertSame($logItem, $e->getLogItem());
+        $this->assertSame($logItem, $e->logItem);
     }
 
     #[Test]
@@ -53,7 +53,7 @@ final class LogFailureExceptionTest extends TestCase
             new \RuntimeException('fail'),
         );
 
-        $this->assertNotInstanceOf(LogDriverInterface::class, $e->getFailingDriver());
+        $this->assertNotInstanceOf(LogDriverInterface::class, $e->failingDriver);
     }
 
     #[Test]
@@ -66,6 +66,6 @@ final class LogFailureExceptionTest extends TestCase
             $driver,
         );
 
-        $this->assertSame($driver, $e->getFailingDriver());
+        $this->assertSame($driver, $e->failingDriver);
     }
 }

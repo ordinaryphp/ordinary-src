@@ -46,32 +46,16 @@ final readonly class GenericLogFormatter implements LogFormatterInterface
 
     private function stringify(mixed $value): string
     {
-        if ($value instanceof \Throwable) {
-            return $this->exceptionFormatter instanceof ExceptionFormatterInterface
+        return match (true) {
+            $value instanceof \Throwable => $this->exceptionFormatter instanceof ExceptionFormatterInterface
                 ? $this->exceptionFormatter->formatException($value)
-                : \sprintf('%s: %s', $value::class, $value->getMessage());
-        }
-
-        if ($value instanceof \Stringable) {
-            return (string) $value;
-        }
-
-        if (\is_bool($value)) {
-            return $value ? 'true' : 'false';
-        }
-
-        if (\is_int($value) || \is_float($value)) {
-            return (string) $value;
-        }
-
-        if (\is_string($value)) {
-            return $value;
-        }
-
-        if ($value === null) {
-            return 'null';
-        }
-
-        return \get_debug_type($value);
+                : \sprintf('%s: %s', $value::class, $value->getMessage()),
+            $value instanceof \Stringable => (string) $value,
+            \is_bool($value) => $value ? 'true' : 'false',
+            \is_int($value), \is_float($value) => (string) $value,
+            \is_string($value) => $value,
+            $value === null => 'null',
+            default => \get_debug_type($value),
+        };
     }
 }

@@ -35,7 +35,7 @@ final class JsonLogFormatterTest extends TestCase
     {
         $data = \json_decode($json, true, 512, \JSON_THROW_ON_ERROR);
         $this->assertIsArray($data);
-
+        /** @var array<string, mixed> $data */
         return $data;
     }
 
@@ -86,7 +86,9 @@ final class JsonLogFormatterTest extends TestCase
         $this->assertArrayHasKey('exception', $data);
         $this->assertIsString($data['exception']);
         $this->assertStringContainsString('RuntimeException', $data['exception']);
-        $this->assertArrayNotHasKey(LogItemInterface::RESERVED_EXCEPTION, $data['context']);
+        $context = $data['context'];
+        $this->assertIsArray($context);
+        $this->assertArrayNotHasKey(LogItemInterface::RESERVED_EXCEPTION, $context);
     }
 
     #[Test]
@@ -104,7 +106,9 @@ final class JsonLogFormatterTest extends TestCase
 
         $data = $this->decode($formatter->formatLog($item));
 
-        $this->assertStringContainsString('code 99', (string) $data['exception']);
+        $exception = $data['exception'];
+        $this->assertIsString($exception);
+        $this->assertStringContainsString('code 99', $exception);
     }
 
     #[Test]
@@ -124,8 +128,10 @@ final class JsonLogFormatterTest extends TestCase
 
         $data = $this->decode($this->formatter->formatLog($item));
 
-        $this->assertTrue($data['context']['t']);
-        $this->assertFalse($data['context']['f']);
+        $context = $data['context'];
+        $this->assertIsArray($context);
+        $this->assertTrue($context['t']);
+        $this->assertFalse($context['f']);
     }
 
     #[Test]
@@ -135,7 +141,9 @@ final class JsonLogFormatterTest extends TestCase
 
         $data = $this->decode($this->formatter->formatLog($item));
 
-        $this->assertNull($data['context']['v']);
+        $context = $data['context'];
+        $this->assertIsArray($context);
+        $this->assertNull($context['v']);
     }
 
     #[Test]
@@ -145,7 +153,9 @@ final class JsonLogFormatterTest extends TestCase
 
         $data = $this->decode($this->formatter->formatLog($item));
 
-        $this->assertSame('NaN', $data['context']['v']);
+        $context = $data['context'];
+        $this->assertIsArray($context);
+        $this->assertSame('NaN', $context['v']);
     }
 
     #[Test]
@@ -155,7 +165,9 @@ final class JsonLogFormatterTest extends TestCase
 
         $data = $this->decode($this->formatter->formatLog($item));
 
-        $this->assertSame('Infinity', $data['context']['v']);
+        $context = $data['context'];
+        $this->assertIsArray($context);
+        $this->assertSame('Infinity', $context['v']);
     }
 
     #[Test]
@@ -168,7 +180,9 @@ final class JsonLogFormatterTest extends TestCase
 
         $this->assertSame('payment', $data['channel']);
         $this->assertSame('channel', \array_key_first($data));
-        $this->assertArrayNotHasKey(LogItemInterface::RESERVED_CHANNEL, $data['context']);
+        $context = $data['context'];
+        $this->assertIsArray($context);
+        $this->assertArrayNotHasKey(LogItemInterface::RESERVED_CHANNEL, $context);
     }
 
     #[Test]
@@ -195,6 +209,8 @@ final class JsonLogFormatterTest extends TestCase
 
         $data = $this->decode($this->formatter->formatLog($item));
 
-        $this->assertSame('my-value', $data['context']['o']);
+        $context = $data['context'];
+        $this->assertIsArray($context);
+        $this->assertSame('my-value', $context['o']);
     }
 }

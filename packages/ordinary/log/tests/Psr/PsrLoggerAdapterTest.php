@@ -73,6 +73,7 @@ final class PsrLoggerAdapterTest extends TestCase
                 },
             );
 
+            // @phpstan-ignore method.dynamicName
             new PsrLoggerAdapter($inner)->{$method}('test', ['exception' => $exception]);
 
             $this->assertArrayHasKey(

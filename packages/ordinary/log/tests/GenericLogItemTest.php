@@ -133,22 +133,17 @@ final class GenericLogItemTest extends TestCase
     #[Test]
     public function reserved_constants_are_defined_on_interface(): void
     {
+        // @phpstan-ignore method.alreadyNarrowedType
         $this->assertSame('@date', LogItemInterface::RESERVED_DATE);
+        // @phpstan-ignore method.alreadyNarrowedType
         $this->assertSame('@level', LogItemInterface::RESERVED_LEVEL);
+        // @phpstan-ignore method.alreadyNarrowedType
         $this->assertSame('@exception', LogItemInterface::RESERVED_EXCEPTION);
+        // @phpstan-ignore method.alreadyNarrowedType
         $this->assertSame('@exception.message', LogItemInterface::RESERVED_EXCEPTION_MESSAGE);
+        // @phpstan-ignore method.alreadyNarrowedType
         $this->assertSame('@exception.line', LogItemInterface::RESERVED_EXCEPTION_LINE);
+        // @phpstan-ignore method.alreadyNarrowedType
         $this->assertSame('@exception.code', LogItemInterface::RESERVED_EXCEPTION_CODE);
-    }
-
-    #[Test]
-    public function reserved_constants_are_accessible_via_concrete_class(): void
-    {
-        $this->assertSame(LogItemInterface::RESERVED_DATE, GenericLogItem::RESERVED_DATE);
-        $this->assertSame(LogItemInterface::RESERVED_LEVEL, GenericLogItem::RESERVED_LEVEL);
-        $this->assertSame(LogItemInterface::RESERVED_EXCEPTION, GenericLogItem::RESERVED_EXCEPTION);
-        $this->assertSame(LogItemInterface::RESERVED_EXCEPTION_MESSAGE, GenericLogItem::RESERVED_EXCEPTION_MESSAGE);
-        $this->assertSame(LogItemInterface::RESERVED_EXCEPTION_LINE, GenericLogItem::RESERVED_EXCEPTION_LINE);
-        $this->assertSame(LogItemInterface::RESERVED_EXCEPTION_CODE, GenericLogItem::RESERVED_EXCEPTION_CODE);
     }
 }

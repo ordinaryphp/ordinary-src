@@ -8,17 +8,19 @@ use DateTimeImmutable;
 use DateTimeInterface;
 use DateTimeZone;
 
-final readonly class GenericDateTimeFormatter implements DateTimeFormatterInterface
+final class GenericDateTimeFormatter implements DateTimeFormatterInterface
 {
-    private DateTimeZone $timezone;
+    public private(set) DateTimeZone $timezone {
+        set(DateTimeZone|string $value) {
+            $this->timezone = $value instanceof DateTimeZone ? $value : new DateTimeZone($value);
+        }
+    }
 
     public function __construct(
-        private string $format = \DATE_ATOM,
-        DateTimeZone|string $timezone = 'UTC',
+        public readonly string $format = 'Y-m-d\TH:i:sp',
+        DateTimeZone|string $timezone = new DateTimeZone('UTC'),
     ) {
-        $this->timezone = $timezone instanceof DateTimeZone
-            ? $timezone
-            : new DateTimeZone($timezone);
+        $this->timezone = $timezone;
     }
 
     public function formatDate(DateTimeInterface $dateTime): string

@@ -153,7 +153,7 @@ final class Logger implements LoggerInterface
                 continue;
             }
 
-            foreach ($group->getDrivers() as [$driver, $driverMatcher]) {
+            foreach ($group->drivers as [$driver, $driverMatcher]) {
                 if ($driverMatcher !== null && !$driverMatcher->matches($logItem)) {
                     continue;
                 }

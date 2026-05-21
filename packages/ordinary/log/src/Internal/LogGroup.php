@@ -14,7 +14,7 @@ use Ordinary\Log\LogMatcherInterface;
 final class LogGroup
 {
     /** @var list<array{0: LogDriverInterface, 1: ?LogMatcherInterface}> */
-    private array $drivers = [];
+    public private(set) array $drivers = [];
 
     public function __construct(
         public readonly string $id,
@@ -29,11 +29,5 @@ final class LogGroup
     public function addDriver(LogDriverInterface $driver, ?LogMatcherInterface $matcher = null): void
     {
         $this->drivers[] = [$driver, $matcher];
-    }
-
-    /** @return list<array{0: LogDriverInterface, 1: ?LogMatcherInterface}> */
-    public function getDrivers(): array
-    {
-        return $this->drivers;
     }
 }

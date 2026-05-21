@@ -19,13 +19,13 @@ final class ErrorLogFailureHandler implements LogFailureHandlerInterface
 {
     public function handleLogFailure(LogFailureExceptionInterface $e): void
     {
-        $driver = $e->getFailingDriver();
+        $driver = $e->failingDriver;
 
         \error_log(\sprintf(
             'Log driver failure%s for [%s] "%s": %s',
             $driver instanceof LogDriverInterface ? ' (' . $driver::class . ')' : '',
-            $e->getLogItem()->level->getFullName(),
-            $e->getLogItem()->message,
+            $e->logItem->level->getFullName(),
+            $e->logItem->message,
             $e->getPrevious()?->getMessage() ?? $e->getMessage(),
         ));
     }

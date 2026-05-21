@@ -9,8 +9,13 @@ use Ordinary\Log\LogMatcherInterface;
 
 final readonly class IsAny implements LogMatcherInterface
 {
-    /** @param list<LogMatcherInterface> $matchers */
-    public function __construct(private array $matchers) {}
+    /** @var list<LogMatcherInterface> */
+    private array $matchers;
+
+    public function __construct(LogMatcherInterface ...$matchers)
+    {
+        $this->matchers = \array_values($matchers);
+    }
 
     public function matches(LogItemInterface $logItem): bool
     {
