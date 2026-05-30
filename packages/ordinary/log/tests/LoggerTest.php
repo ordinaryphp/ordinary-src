@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Ordinary\Log\Tests;
 
+use DateTimeImmutable;
 use Ordinary\Log\FailureHandler\NoOpFailureHandler;
+use Ordinary\Log\FlushableInterface;
 use Ordinary\Log\GenericCallableProcessor;
 use Ordinary\Log\ImmutableLogItemInterface;
 use Ordinary\Log\LogDriverInterface;
@@ -16,6 +18,7 @@ use Ordinary\Log\LogLevel;
 use Ordinary\Log\LogProcessorInterface;
 use Ordinary\Log\Matcher\IsLevelOrHigher;
 use Ordinary\Log\SynchronousDriverInterface;
+use Ordinary\Log\Tests\Support\MutableClock;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
@@ -366,6 +369,90 @@ final class LoggerTest extends TestCase
     }
 
     #[Test]
+    public function flush_calls_flush_on_all_flushable_drivers(): void
+    {
+        $flushable = $this->createMock(FlushableLogDriverDouble::class);
+        $flushable->expects($this->once())->method('flush');
+
+        $logger = new Logger(onFailure: new NoOpFailureHandler());
+        $logger->add($flushable);
+        $logger->flush();
+    }
+
+    #[Test]
+    public function flush_skips_non_flushable_drivers(): void
+    {
+        $driver = $this->createMock(LogDriverInterface::class);
+        $driver->expects($this->never())->method('handleLog');
+
+        $logger = new Logger(onFailure: new NoOpFailureHandler());
+        $logger->add($driver);
+        $logger->flush();
+    }
+
+    #[Test]
+    public function flush_propagates_to_drivers_in_all_groups(): void
+    {
+        $flushableA = $this->createMock(FlushableLogDriverDouble::class);
+        $flushableA->expects($this->once())->method('flush');
+
+        $flushableB = $this->createMock(FlushableLogDriverDouble::class);
+        $flushableB->expects($this->once())->method('flush');
+
+        $logger = new Logger(onFailure: new NoOpFailureHandler());
+        $logger->add($flushableA);
+        $logger->addGroup('secondary');
+        $logger->add($flushableB, group: 'secondary');
+        $logger->flush();
+    }
+
+    #[Test]
+    public function flush_attempts_all_drivers_before_rethrowing(): void
+    {
+        $failingA = $this->createStub(FlushableLogDriverDouble::class);
+        $failingA->method('flush')->willThrowException(new \RuntimeException('first'));
+
+        $failingB = $this->createMock(FlushableLogDriverDouble::class);
+        $failingB->expects($this->once())->method('flush');
+
+        $logger = new Logger(onFailure: new NoOpFailureHandler());
+        $logger->add($failingA);
+        $logger->add($failingB);
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('first');
+        $logger->flush();
+    }
+
+    #[Test]
+    public function flush_is_noop_when_no_flushable_drivers_registered(): void
+    {
+        $this->expectNotToPerformAssertions();
+        $logger = new Logger(onFailure: new NoOpFailureHandler());
+        $logger->flush();
+    }
+
+    #[Test]
+    public function it_uses_injected_clock_for_log_item_timestamps(): void
+    {
+        $fixedTime = new DateTimeImmutable('2024-06-15T10:30:00Z');
+        $clock = new MutableClock($fixedTime);
+
+        $capturedItem = null;
+        $driver = $this->createStub(LogDriverInterface::class);
+        $driver->method('handleLog')->willReturnCallback(function (LogItemInterface $item) use (&$capturedItem): void {
+            $capturedItem = $item;
+        });
+
+        $logger = new Logger(clock: $clock, onFailure: new NoOpFailureHandler());
+        $logger->add($driver);
+        $logger->error('timed event');
+
+        $this->assertInstanceOf(LogItemInterface::class, $capturedItem);
+        $this->assertSame($fixedTime, $capturedItem->dateTime);
+    }
+
+    #[Test]
     public function it_uses_error_log_failure_handler_by_default(): void
     {
         $driver = $this->createStub(LogDriverInterface::class);
@@ -389,3 +476,8 @@ final class LoggerTest extends TestCase
         }
     }
 }
+
+/**
+ * Test double: a LogDriverInterface that is also FlushableInterface.
+ */
+abstract class FlushableLogDriverDouble implements LogDriverInterface, FlushableInterface {}

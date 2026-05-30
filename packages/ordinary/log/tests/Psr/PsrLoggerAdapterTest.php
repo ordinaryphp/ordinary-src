@@ -6,9 +6,9 @@ namespace Ordinary\Log\Tests\Psr;
 
 use Ordinary\Log\LoggerInterface;
 use Ordinary\Log\LogItemInterface;
-use Ordinary\Log\LogLevel;
 use Ordinary\Log\Psr\PsrLoggerAdapter;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LogLevel as PsrLogLevel;
@@ -84,42 +84,53 @@ final class PsrLoggerAdapterTest extends TestCase
         }
     }
 
-    #[Test]
-    public function log_maps_psr_level_to_internal_level(): void
+    /** @return array<string, array{non-empty-string, non-empty-string}> */
+    public static function psrLevelToMethodProvider(): array
     {
-        $capturedItem = null;
+        return [
+            'emergency' => [PsrLogLevel::EMERGENCY, 'emergency'],
+            'alert'     => [PsrLogLevel::ALERT,     'alert'],
+            'critical'  => [PsrLogLevel::CRITICAL,  'critical'],
+            'error'     => [PsrLogLevel::ERROR,      'error'],
+            'warning'   => [PsrLogLevel::WARNING,    'warning'],
+            'notice'    => [PsrLogLevel::NOTICE,     'notice'],
+            'info'      => [PsrLogLevel::INFO,       'info'],
+            'debug'     => [PsrLogLevel::DEBUG,      'debug'],
+        ];
+    }
 
-        $inner = $this->createStub(LoggerInterface::class);
-        $inner->method('log')->willReturnCallback(
-            function (LogItemInterface $item) use (&$capturedItem): void {
-                $capturedItem = $item;
-            },
-        );
+    /**
+     * @param non-empty-string $psrLevel
+     * @param non-empty-string $method
+     */
+    #[Test]
+    #[DataProvider('psrLevelToMethodProvider')]
+    public function log_dispatches_to_named_method_for_level(string $psrLevel, string $method): void
+    {
+        $inner = $this->createMock(LoggerInterface::class);
+        $inner->expects($this->once())->method($method)->with('test msg', []);
 
-        new PsrLoggerAdapter($inner)->log(PsrLogLevel::WARNING, 'test');
-
-        $this->assertInstanceOf(LogItemInterface::class, $capturedItem);
-        $this->assertSame(LogLevel::Warning, $capturedItem->level);
+        new PsrLoggerAdapter($inner)->log($psrLevel, 'test msg');
     }
 
     #[Test]
     public function log_translates_exception_key_via_log_method(): void
     {
         $exception = new \RuntimeException('fail');
-        $capturedItem = null;
+        $capturedContext = null;
 
         $inner = $this->createStub(LoggerInterface::class);
-        $inner->method('log')->willReturnCallback(
-            function (LogItemInterface $item) use (&$capturedItem): void {
-                $capturedItem = $item;
+        $inner->method('error')->willReturnCallback(
+            function (string $message, array $context) use (&$capturedContext): void {
+                $capturedContext = $context;
             },
         );
 
         new PsrLoggerAdapter($inner)->log(PsrLogLevel::ERROR, 'test', ['exception' => $exception]);
 
-        $this->assertInstanceOf(LogItemInterface::class, $capturedItem);
-        $this->assertArrayHasKey(LogItemInterface::RESERVED_EXCEPTION, $capturedItem->context);
-        $this->assertArrayNotHasKey('exception', $capturedItem->context);
+        $this->assertIsArray($capturedContext);
+        $this->assertArrayHasKey(LogItemInterface::RESERVED_EXCEPTION, $capturedContext);
+        $this->assertArrayNotHasKey('exception', $capturedContext);
     }
 
     #[Test]

@@ -4,11 +4,8 @@ declare(strict_types=1);
 
 namespace Ordinary\Log\Psr;
 
-use DateTimeImmutable;
-use Ordinary\Log\GenericLogItem;
 use Ordinary\Log\LoggerInterface;
 use Ordinary\Log\LogItemInterface;
-use Ordinary\Log\LogLevel;
 use Psr\Log\LoggerInterface as PsrLoggerInterface;
 use Psr\Log\LogLevel as PsrLogLevel;
 
@@ -91,8 +88,22 @@ final readonly class PsrLoggerAdapter implements PsrLoggerInterface
             );
         }
 
-        $logLevel = $this->mapPsrLevel($level);
-        $this->logger->log(new GenericLogItem($logLevel, (string) $message, new DateTimeImmutable(), $this->translateContext($context)));
+        $msg = (string) $message;
+        $ctx = $this->translateContext($context);
+
+        match ($level) {
+            PsrLogLevel::EMERGENCY => $this->logger->emergency($msg, $ctx),
+            PsrLogLevel::ALERT     => $this->logger->alert($msg, $ctx),
+            PsrLogLevel::CRITICAL  => $this->logger->critical($msg, $ctx),
+            PsrLogLevel::ERROR     => $this->logger->error($msg, $ctx),
+            PsrLogLevel::WARNING   => $this->logger->warning($msg, $ctx),
+            PsrLogLevel::NOTICE    => $this->logger->notice($msg, $ctx),
+            PsrLogLevel::INFO      => $this->logger->info($msg, $ctx),
+            PsrLogLevel::DEBUG     => $this->logger->debug($msg, $ctx),
+            default                => throw new \InvalidArgumentException(
+                \sprintf('Unknown PSR log level: "%s"', $level),
+            ),
+        };
     }
 
     /**
@@ -114,22 +125,5 @@ final readonly class PsrLoggerAdapter implements PsrLoggerInterface
         }
 
         return $context;
-    }
-
-    private function mapPsrLevel(string $level): LogLevel
-    {
-        return match ($level) {
-            PsrLogLevel::EMERGENCY => LogLevel::Emergency,
-            PsrLogLevel::ALERT => LogLevel::Alert,
-            PsrLogLevel::CRITICAL => LogLevel::Critical,
-            PsrLogLevel::ERROR => LogLevel::Error,
-            PsrLogLevel::WARNING => LogLevel::Warning,
-            PsrLogLevel::NOTICE => LogLevel::Notice,
-            PsrLogLevel::INFO => LogLevel::Info,
-            PsrLogLevel::DEBUG => LogLevel::Debug,
-            default => throw new \InvalidArgumentException(
-                \sprintf('Unknown PSR log level: "%s"', $level),
-            ),
-        };
     }
 }

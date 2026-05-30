@@ -22,7 +22,7 @@ final class GenericDateTimeFormatterTest extends TestCase
 
         $result = $formatter->formatDate($dt);
 
-        $this->assertSame('2024-06-01T12:00:00+00:00', $result);
+        $this->assertSame('2024-06-01T12:00:00Z', $result);
     }
 
     #[Test]

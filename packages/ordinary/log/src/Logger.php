@@ -6,6 +6,7 @@ namespace Ordinary\Log;
 
 use Ordinary\Log\FailureHandler\ErrorLogFailureHandler;
 use Ordinary\Log\Internal\LogGroup;
+use Psr\Clock\ClockInterface;
 
 /**
  * Primary logger. Fans log items out to one or more drivers, organised into
@@ -51,12 +52,18 @@ final class Logger implements LoggerInterface
      *                                              Called when a driver throws. Defaults to {@see ErrorLogFailureHandler},
      *                                              which writes a message to PHP's error log. Pass
      *                                              {@see \Ordinary\Log\FailureHandler\NoOpFailureHandler} to silence failures.
+     * @param ClockInterface $clock
+     *                              Clock used to timestamp log items created via the named helper methods
+     *                              (info(), error(), etc.). Defaults to {@see UtcClock}. Inject a test
+     *                              double to control timestamps in unit tests.
      */
     public function __construct(
         public readonly string $channel = '',
         private readonly ?\Closure $dispatcher = null,
         private readonly LogFailureHandlerInterface $onFailure = new ErrorLogFailureHandler(),
+        ClockInterface $clock = new UtcClock(),
     ) {
+        $this->clock = $clock;
         $this->groups[self::DEFAULT_GROUP] = new LogGroup(self::DEFAULT_GROUP);
     }
 
@@ -134,6 +141,37 @@ final class Logger implements LoggerInterface
         }
 
         $this->groups[$group]->addDriver($driver, $matcher);
+    }
+
+    /**
+     * Flushes all registered drivers that implement FlushableInterface.
+     *
+     * Call this at the end of each request or job to drain any buffered items.
+     * Every flushable driver is attempted regardless of whether a previous flush
+     * threw; the first exception, if any, is re-thrown after all drivers have
+     * been attempted.
+     */
+    public function flush(): void
+    {
+        $firstFailure = null;
+
+        foreach ($this->groups as $group) {
+            foreach ($group->drivers as [$driver]) {
+                if (!($driver instanceof FlushableInterface)) {
+                    continue;
+                }
+
+                try {
+                    $driver->flush();
+                } catch (\Throwable $e) {
+                    $firstFailure ??= $e;
+                }
+            }
+        }
+
+        if ($firstFailure instanceof \Throwable) {
+            throw $firstFailure;
+        }
     }
 
     public function log(LogItemInterface $logItem): void
