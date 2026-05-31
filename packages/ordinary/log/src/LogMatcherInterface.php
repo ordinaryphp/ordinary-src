@@ -6,5 +6,5 @@ namespace Ordinary\Log;
 
 interface LogMatcherInterface
 {
-    public function matches(LogItemInterface $logItem): bool;
+    public function matches(LogEntryInterface $logItem): bool;
 }

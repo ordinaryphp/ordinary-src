@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Ordinary\Log\Tests\Processor;
 
 use DateTimeImmutable;
-use Ordinary\Log\GenericLogItem;
+use Ordinary\Log\LogEntry;
 use Ordinary\Log\LogLevel;
 use Ordinary\Log\Processor\WebProcessor;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -56,7 +56,7 @@ final class WebProcessorTest extends TestCase
     public function it_reads_url_from_psr_uri(): void
     {
         $processor = new WebProcessor($this->fakeRequest());
-        $result = $processor->process(new GenericLogItem(LogLevel::Info, 'msg', new DateTimeImmutable()));
+        $result = $processor->process(new LogEntry(LogLevel::Info, 'msg', new DateTimeImmutable()));
 
         $this->assertSame('https://example.com/api/users/42', $result->context['request.url']);
     }
@@ -65,7 +65,7 @@ final class WebProcessorTest extends TestCase
     public function it_reads_method_from_psr_request(): void
     {
         $processor = new WebProcessor($this->fakeRequest(method: 'DELETE'));
-        $result = $processor->process(new GenericLogItem(LogLevel::Info, 'msg', new DateTimeImmutable()));
+        $result = $processor->process(new LogEntry(LogLevel::Info, 'msg', new DateTimeImmutable()));
 
         $this->assertSame('DELETE', $result->context['request.method']);
     }
@@ -74,7 +74,7 @@ final class WebProcessorTest extends TestCase
     public function it_reads_server_name_from_psr_uri_host(): void
     {
         $processor = new WebProcessor($this->fakeRequest());
-        $result = $processor->process(new GenericLogItem(LogLevel::Info, 'msg', new DateTimeImmutable()));
+        $result = $processor->process(new LogEntry(LogLevel::Info, 'msg', new DateTimeImmutable()));
 
         $this->assertSame('example.com', $result->context['request.server']);
     }
@@ -93,7 +93,7 @@ final class WebProcessorTest extends TestCase
         $request->method('getServerParams')->willReturn(['SERVER_NAME' => 'fallback.example.com']);
 
         $result = (new WebProcessor($request))->process(
-            new GenericLogItem(LogLevel::Info, 'msg', new DateTimeImmutable()),
+            new LogEntry(LogLevel::Info, 'msg', new DateTimeImmutable()),
         );
 
         $this->assertSame('fallback.example.com', $result->context['request.server']);
@@ -103,7 +103,7 @@ final class WebProcessorTest extends TestCase
     public function it_reads_referrer_from_referer_header(): void
     {
         $processor = new WebProcessor($this->fakeRequest(referrer: 'https://example.com/dashboard'));
-        $result = $processor->process(new GenericLogItem(LogLevel::Info, 'msg', new DateTimeImmutable()));
+        $result = $processor->process(new LogEntry(LogLevel::Info, 'msg', new DateTimeImmutable()));
 
         $this->assertSame('https://example.com/dashboard', $result->context['request.referrer']);
     }
@@ -112,7 +112,7 @@ final class WebProcessorTest extends TestCase
     public function it_reads_user_agent_from_header(): void
     {
         $processor = new WebProcessor($this->fakeRequest(userAgent: 'MyBot/1.0'));
-        $result = $processor->process(new GenericLogItem(LogLevel::Info, 'msg', new DateTimeImmutable()));
+        $result = $processor->process(new LogEntry(LogLevel::Info, 'msg', new DateTimeImmutable()));
 
         $this->assertSame('MyBot/1.0', $result->context['request.user_agent']);
     }
@@ -121,7 +121,7 @@ final class WebProcessorTest extends TestCase
     public function it_reads_ip_from_server_params(): void
     {
         $processor = new WebProcessor($this->fakeRequest());
-        $result = $processor->process(new GenericLogItem(LogLevel::Info, 'msg', new DateTimeImmutable()));
+        $result = $processor->process(new LogEntry(LogLevel::Info, 'msg', new DateTimeImmutable()));
 
         $this->assertSame('10.0.0.1', $result->context['request.ip']);
     }
@@ -130,7 +130,7 @@ final class WebProcessorTest extends TestCase
     public function it_reads_extra_fields_from_server_params(): void
     {
         $processor = new WebProcessor($this->fakeRequest(), extraFields: ['HTTP_X_REQUEST_ID']);
-        $result = $processor->process(new GenericLogItem(LogLevel::Info, 'msg', new DateTimeImmutable()));
+        $result = $processor->process(new LogEntry(LogLevel::Info, 'msg', new DateTimeImmutable()));
 
         $this->assertSame('req-abc', $result->context['request.http_x_request_id']);
     }
@@ -153,7 +153,7 @@ final class WebProcessorTest extends TestCase
         ]);
 
         $result = (new WebProcessor($request))->process(
-            new GenericLogItem(LogLevel::Info, 'msg', new DateTimeImmutable()),
+            new LogEntry(LogLevel::Info, 'msg', new DateTimeImmutable()),
         );
 
         $this->assertSame('PATCH', $result->context['request.method']);
@@ -174,7 +174,7 @@ final class WebProcessorTest extends TestCase
         $request->method('getHeaderLine')->willReturn('');
         $request->method('getServerParams')->willReturn([]);
 
-        $item = new GenericLogItem(LogLevel::Info, 'msg', new DateTimeImmutable(), ['a' => 1]);
+        $item = new LogEntry(LogLevel::Info, 'msg', new DateTimeImmutable(), ['a' => 1]);
         $result = (new WebProcessor($request))->process($item);
 
         $this->assertSame($item, $result);
@@ -193,7 +193,7 @@ final class WebProcessorTest extends TestCase
             'HTTP_REFERER'    => 'https://example.com/dashboard',
             'HTTP_USER_AGENT' => 'Mozilla/5.0',
         ]);
-        $result = $processor->process(new GenericLogItem(LogLevel::Info, 'msg', new DateTimeImmutable()));
+        $result = $processor->process(new LogEntry(LogLevel::Info, 'msg', new DateTimeImmutable()));
 
         $this->assertSame('/api/users/42', $result->context['request.url']);
         $this->assertSame('10.0.0.1', $result->context['request.ip']);
@@ -207,7 +207,7 @@ final class WebProcessorTest extends TestCase
     public function it_skips_missing_array_fields(): void
     {
         $result = (new WebProcessor(['REQUEST_URI' => '/test']))->process(
-            new GenericLogItem(LogLevel::Info, 'msg', new DateTimeImmutable()),
+            new LogEntry(LogLevel::Info, 'msg', new DateTimeImmutable()),
         );
 
         $this->assertArrayHasKey('request.url', $result->context);
@@ -221,7 +221,7 @@ final class WebProcessorTest extends TestCase
             ['REQUEST_URI' => '/test', 'HTTP_X_REQUEST_ID' => 'abc123'],
             extraFields: ['HTTP_X_REQUEST_ID'],
         );
-        $result = $processor->process(new GenericLogItem(LogLevel::Info, 'msg', new DateTimeImmutable()));
+        $result = $processor->process(new LogEntry(LogLevel::Info, 'msg', new DateTimeImmutable()));
 
         $this->assertSame('abc123', $result->context['request.http_x_request_id']);
     }
@@ -229,7 +229,7 @@ final class WebProcessorTest extends TestCase
     #[Test]
     public function it_returns_item_unchanged_when_array_has_no_matching_keys(): void
     {
-        $item = new GenericLogItem(LogLevel::Info, 'msg', new DateTimeImmutable(), ['a' => 1]);
+        $item = new LogEntry(LogLevel::Info, 'msg', new DateTimeImmutable(), ['a' => 1]);
         $result = (new WebProcessor([]))->process($item);
 
         $this->assertSame($item, $result);
@@ -240,7 +240,7 @@ final class WebProcessorTest extends TestCase
     #[Test]
     public function it_returns_item_unchanged_when_null(): void
     {
-        $item = new GenericLogItem(LogLevel::Info, 'msg', new DateTimeImmutable(), ['a' => 1]);
+        $item = new LogEntry(LogLevel::Info, 'msg', new DateTimeImmutable(), ['a' => 1]);
         $result = (new WebProcessor())->process($item);
 
         $this->assertSame($item, $result);
@@ -252,7 +252,7 @@ final class WebProcessorTest extends TestCase
     public function it_preserves_existing_context(): void
     {
         $processor = new WebProcessor($this->fakeRequest());
-        $item = new GenericLogItem(LogLevel::Info, 'msg', new DateTimeImmutable(), ['user_id' => 99]);
+        $item = new LogEntry(LogLevel::Info, 'msg', new DateTimeImmutable(), ['user_id' => 99]);
 
         $result = $processor->process($item);
 
@@ -264,7 +264,7 @@ final class WebProcessorTest extends TestCase
     public function it_does_not_mutate_original_item(): void
     {
         $processor = new WebProcessor($this->fakeRequest());
-        $item = new GenericLogItem(LogLevel::Info, 'msg', new DateTimeImmutable());
+        $item = new LogEntry(LogLevel::Info, 'msg', new DateTimeImmutable());
 
         $processor->process($item);
 

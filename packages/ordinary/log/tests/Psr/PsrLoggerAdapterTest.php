@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Ordinary\Log\Tests\Psr;
 
+use Ordinary\Log\LogEntryInterface;
 use Ordinary\Log\LoggerInterface;
-use Ordinary\Log\LogItemInterface;
 use Ordinary\Log\Psr\PsrLoggerAdapter;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -32,8 +32,8 @@ final class PsrLoggerAdapterTest extends TestCase
         new PsrLoggerAdapter($inner)->error('test', ['exception' => $exception]);
 
         $this->assertIsArray($capturedContext);
-        $this->assertArrayHasKey(LogItemInterface::RESERVED_EXCEPTION, $capturedContext);
-        $this->assertSame($exception, $capturedContext[LogItemInterface::RESERVED_EXCEPTION]);
+        $this->assertArrayHasKey(LogEntryInterface::RESERVED_EXCEPTION, $capturedContext);
+        $this->assertSame($exception, $capturedContext[LogEntryInterface::RESERVED_EXCEPTION]);
     }
 
     #[Test]
@@ -75,7 +75,7 @@ final class PsrLoggerAdapterTest extends TestCase
             new PsrLoggerAdapter($inner)->{$method}('test', ['exception' => $exception]);
 
             $this->assertArrayHasKey(
-                LogItemInterface::RESERVED_EXCEPTION,
+                LogEntryInterface::RESERVED_EXCEPTION,
                 $capturedContext ?? [],
                 \sprintf('Method %s() did not pass the exception key', $method),
             );
@@ -127,8 +127,8 @@ final class PsrLoggerAdapterTest extends TestCase
         new PsrLoggerAdapter($inner)->log(PsrLogLevel::ERROR, 'test', ['exception' => $exception]);
 
         $this->assertIsArray($capturedContext);
-        $this->assertArrayHasKey(LogItemInterface::RESERVED_EXCEPTION, $capturedContext);
-        $this->assertSame($exception, $capturedContext[LogItemInterface::RESERVED_EXCEPTION]);
+        $this->assertArrayHasKey(LogEntryInterface::RESERVED_EXCEPTION, $capturedContext);
+        $this->assertSame($exception, $capturedContext[LogEntryInterface::RESERVED_EXCEPTION]);
     }
 
     #[Test]

@@ -6,12 +6,12 @@ namespace Ordinary\Log\Tests\Driver;
 
 use Aws\CloudWatchLogs\CloudWatchLogsClient;
 use DateTimeImmutable;
+use Ordinary\Log\DateTimeFormatter;
 use Ordinary\Log\Driver\CloudWatchDriver;
-use Ordinary\Log\GenericDateTimeFormatter;
-use Ordinary\Log\GenericLevelFormatter;
-use Ordinary\Log\GenericLogFormatter;
-use Ordinary\Log\GenericLogItem;
+use Ordinary\Log\LevelFormatter;
+use Ordinary\Log\LogEntry;
 use Ordinary\Log\LogLevel;
+use Ordinary\Log\TextFormatter;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
@@ -28,9 +28,9 @@ final class CloudWatchDriverTest extends TestCase
         }
     }
 
-    private function makeFormatter(): GenericLogFormatter
+    private function makeFormatter(): TextFormatter
     {
-        return new GenericLogFormatter(new GenericDateTimeFormatter(), new GenericLevelFormatter());
+        return new TextFormatter(new DateTimeFormatter(), new LevelFormatter());
     }
 
     /** @return CloudWatchLogsClient&MockObject */
@@ -66,7 +66,7 @@ final class CloudWatchDriverTest extends TestCase
             }));
 
         $driver = new CloudWatchDriver($client, 'g', 's');
-        $driver->handleLog(new GenericLogItem(LogLevel::Info, 'default formatter test', new DateTimeImmutable()));
+        $driver->handleLog(new LogEntry(LogLevel::Info, 'default formatter test', new DateTimeImmutable()));
     }
 
     #[Test]
@@ -93,7 +93,7 @@ final class CloudWatchDriverTest extends TestCase
             }));
 
         $driver = new CloudWatchDriver($client, 'my-group', 'my-stream', $this->makeFormatter());
-        $driver->handleLog(new GenericLogItem(LogLevel::Error, 'something failed', new DateTimeImmutable()));
+        $driver->handleLog(new LogEntry(LogLevel::Error, 'something failed', new DateTimeImmutable()));
     }
 
     #[Test]
@@ -116,7 +116,7 @@ final class CloudWatchDriverTest extends TestCase
             }));
 
         $driver = new CloudWatchDriver($client, 'g', 's', $this->makeFormatter());
-        $driver->handleLog(new GenericLogItem(LogLevel::Info, 'msg', new DateTimeImmutable()));
+        $driver->handleLog(new LogEntry(LogLevel::Info, 'msg', new DateTimeImmutable()));
     }
 
     #[Test]
@@ -130,6 +130,6 @@ final class CloudWatchDriverTest extends TestCase
 
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('network error');
-        $driver->handleLog(new GenericLogItem(LogLevel::Error, 'msg', new DateTimeImmutable()));
+        $driver->handleLog(new LogEntry(LogLevel::Error, 'msg', new DateTimeImmutable()));
     }
 }

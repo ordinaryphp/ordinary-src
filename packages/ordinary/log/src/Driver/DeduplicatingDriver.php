@@ -6,10 +6,10 @@ namespace Ordinary\Log\Driver;
 
 use DateTimeImmutable;
 use Ordinary\Log\FlushableInterface;
-use Ordinary\Log\GenericLogItem;
-use Ordinary\Log\ImmutableLogItemInterface;
+use Ordinary\Log\ImmutableLogEntryInterface;
 use Ordinary\Log\LogDriverInterface;
-use Ordinary\Log\LogItemInterface;
+use Ordinary\Log\LogEntry;
+use Ordinary\Log\LogEntryInterface;
 use Ordinary\Log\UtcClock;
 use Psr\Clock\ClockInterface;
 
@@ -34,14 +34,14 @@ use Psr\Clock\ClockInterface;
  * $logger->add(new DeduplicatingDriver(
  *     new StreamDriver(STDERR),
  *     windowSeconds: 300,
- *     fingerprint: fn(LogItemInterface $item) => $item->level->name . ':' . ($item->context['event'] ?? $item->message),
+ *     fingerprint: fn(LogEntryInterface $item) => $item->level->name . ':' . ($item->context['event'] ?? $item->message),
  * ));
  * ```
  */
 final class DeduplicatingDriver implements LogDriverInterface, FlushableInterface
 {
     /**
-     * @var array<string, array{item: LogItemInterface, firstSeen: DateTimeImmutable, times: list<DateTimeImmutable>}>
+     * @var array<string, array{item: LogEntryInterface, firstSeen: DateTimeImmutable, times: list<DateTimeImmutable>}>
      */
     private array $pending = [];
 
@@ -50,8 +50,8 @@ final class DeduplicatingDriver implements LogDriverInterface, FlushableInterfac
      * @param int $windowSeconds
      *                           Seconds a fingerprint is held. Expiry triggers a dedup-summary
      *                           dispatch on the next handleLog call.
-     * @param \Closure(LogItemInterface): string|null $fingerprint
-     *                                                             Custom fingerprint callback. Defaults to "{level}:{message}".
+     * @param \Closure(LogEntryInterface): string|null $fingerprint
+     *                                                              Custom fingerprint callback. Defaults to "{level}:{message}".
      * @param ClockInterface $clock
      *                              Clock used for window tracking. Defaults to {@see UtcClock}. Inject a
      *                              test double to control time in unit tests.
@@ -63,7 +63,7 @@ final class DeduplicatingDriver implements LogDriverInterface, FlushableInterfac
         private readonly ClockInterface $clock = new UtcClock(),
     ) {}
 
-    public function handleLog(LogItemInterface $logItem): void
+    public function handleLog(LogEntryInterface $logItem): void
     {
         $this->evict();
 
@@ -136,7 +136,7 @@ final class DeduplicatingDriver implements LogDriverInterface, FlushableInterfac
     }
 
     /**
-     * @param array{item: LogItemInterface, firstSeen: DateTimeImmutable, times: list<DateTimeImmutable>} $entry
+     * @param array{item: LogEntryInterface, firstSeen: DateTimeImmutable, times: list<DateTimeImmutable>} $entry
      */
     private function dispatchEntry(array $entry): void
     {
@@ -150,10 +150,10 @@ final class DeduplicatingDriver implements LogDriverInterface, FlushableInterfac
             'dedup_times' => $entry['times'],
         ];
 
-        if ($item instanceof ImmutableLogItemInterface) {
+        if ($item instanceof ImmutableLogEntryInterface) {
             $item = $item->withContext($context);
         } else {
-            $item = new GenericLogItem(
+            $item = new LogEntry(
                 $item->level,
                 $item->message,
                 $item->dateTime,

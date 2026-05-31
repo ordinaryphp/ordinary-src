@@ -6,7 +6,7 @@ namespace Ordinary\Log;
 
 use DateTimeInterface;
 
-interface LogItemInterface
+interface LogEntryInterface
 {
     /**
      * Context key injected by formatters as a placeholder for the formatted log date.
@@ -72,7 +72,7 @@ interface LogItemInterface
     public string $message { get; }
 
     /**
-     * Returns the structured context for this log item.
+     * Returns the structured context for this log entry.
      *
      * {@see self::RESERVED_DATE}, {@see self::RESERVED_LEVEL},
      * {@see self::RESERVED_EXCEPTION_MESSAGE}, {@see self::RESERVED_EXCEPTION_LINE},

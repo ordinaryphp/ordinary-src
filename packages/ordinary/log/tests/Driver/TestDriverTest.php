@@ -6,7 +6,7 @@ namespace Ordinary\Log\Tests\Driver;
 
 use DateTimeImmutable;
 use Ordinary\Log\Driver\TestDriver;
-use Ordinary\Log\GenericLogItem;
+use Ordinary\Log\LogEntry;
 use Ordinary\Log\LogLevel;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
@@ -15,9 +15,9 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(TestDriver::class)]
 final class TestDriverTest extends TestCase
 {
-    private function item(LogLevel $level, string $message): GenericLogItem
+    private function item(LogLevel $level, string $message): LogEntry
     {
-        return new GenericLogItem($level, $message, new DateTimeImmutable());
+        return new LogEntry($level, $message, new DateTimeImmutable());
     }
 
     #[Test]

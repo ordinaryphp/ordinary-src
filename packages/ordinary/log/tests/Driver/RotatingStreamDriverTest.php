@@ -7,9 +7,9 @@ namespace Ordinary\Log\Tests\Driver;
 use DateTimeImmutable;
 use DateTimeZone;
 use Ordinary\Log\Driver\RotatingStreamDriver;
-use Ordinary\Log\GenericLogItem;
+use Ordinary\Log\LogEntry;
+use Ordinary\Log\LogEntryInterface;
 use Ordinary\Log\LogFormatterInterface;
-use Ordinary\Log\LogItemInterface;
 use Ordinary\Log\LogLevel;
 use Ordinary\Log\SynchronousDriverInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -42,9 +42,9 @@ final class RotatingStreamDriverTest extends TestCase
         return $this->tmpDir . '/' . $name;
     }
 
-    private function item(string $date, string $message = 'msg'): GenericLogItem
+    private function item(string $date, string $message = 'msg'): LogEntry
     {
-        return new GenericLogItem(
+        return new LogEntry(
             LogLevel::Info,
             $message,
             new DateTimeImmutable($date, new DateTimeZone('UTC')),
@@ -95,7 +95,7 @@ final class RotatingStreamDriverTest extends TestCase
     public function each_line_ends_with_newline(): void
     {
         $formatter = new class implements LogFormatterInterface {
-            public function formatLog(LogItemInterface $logItem): string
+            public function formatLog(LogEntryInterface $logItem): string
             {
                 return $logItem->message;
             }

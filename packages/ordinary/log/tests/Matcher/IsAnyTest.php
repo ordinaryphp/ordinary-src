@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Ordinary\Log\Tests\Matcher;
 
 use DateTimeImmutable;
-use Ordinary\Log\GenericLogItem;
+use Ordinary\Log\LogEntry;
 use Ordinary\Log\LogLevel;
 use Ordinary\Log\Matcher\IsAny;
 use Ordinary\Log\Matcher\IsLevel;
@@ -24,10 +24,10 @@ final class IsAnyTest extends TestCase
             new IsLevel(LogLevel::Emergency),
         );
 
-        $this->assertTrue($matcher->matches(new GenericLogItem(LogLevel::Debug, 'msg', new DateTimeImmutable())));
-        $this->assertTrue($matcher->matches(new GenericLogItem(LogLevel::Emergency, 'msg', new DateTimeImmutable())));
-        $this->assertFalse($matcher->matches(new GenericLogItem(LogLevel::Info, 'msg', new DateTimeImmutable())));
-        $this->assertFalse($matcher->matches(new GenericLogItem(LogLevel::Error, 'msg', new DateTimeImmutable())));
+        $this->assertTrue($matcher->matches(new LogEntry(LogLevel::Debug, 'msg', new DateTimeImmutable())));
+        $this->assertTrue($matcher->matches(new LogEntry(LogLevel::Emergency, 'msg', new DateTimeImmutable())));
+        $this->assertFalse($matcher->matches(new LogEntry(LogLevel::Info, 'msg', new DateTimeImmutable())));
+        $this->assertFalse($matcher->matches(new LogEntry(LogLevel::Error, 'msg', new DateTimeImmutable())));
     }
 
     #[Test]
@@ -35,6 +35,6 @@ final class IsAnyTest extends TestCase
     {
         $matcher = new IsAny();
 
-        $this->assertFalse($matcher->matches(new GenericLogItem(LogLevel::Emergency, 'msg', new DateTimeImmutable())));
+        $this->assertFalse($matcher->matches(new LogEntry(LogLevel::Emergency, 'msg', new DateTimeImmutable())));
     }
 }

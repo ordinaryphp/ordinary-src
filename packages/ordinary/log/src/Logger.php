@@ -6,6 +6,7 @@ namespace Ordinary\Log;
 
 use Ordinary\Log\FailureHandler\ErrorLogFailureHandler;
 use Ordinary\Log\Internal\LogGroup;
+use Ordinary\Log\Psr\PsrLoggerAdapter;
 use Psr\Clock\ClockInterface;
 
 /**
@@ -18,10 +19,10 @@ use Psr\Clock\ClockInterface;
  *
  * ```php
  * $logger = new Logger(channel: 'payment');
- * $logger->addProcessor(new GenericCallableProcessor(
- *     fn(ImmutableLogItemInterface $item) => $item->withContext(['request_id' => $requestId]),
+ * $logger->addProcessor(new CallableProcessor(
+ *     fn(ImmutableLogEntryInterface $item) => $item->withContext(['request_id' => $requestId]),
  * ));
- * $logger->add(new StreamDriver(STDOUT, new JsonLogFormatter()));
+ * $logger->add(new StreamDriver(STDOUT, new JsonFormatter()));
  * $logger->info('Charge processed', ['amount' => 99.00]);
  * ```
  */
@@ -41,8 +42,8 @@ final class Logger implements LoggerInterface
      * @param string $channel
      *                        Optional channel name stamped on every log item before dispatch and
      *                        processors run. Appears as a top-level `"channel"` field in
-     *                        {@see \Ordinary\Log\JsonLogFormatter} output and as the `{@channel}`
-     *                        placeholder in {@see \Ordinary\Log\GenericLogFormatter}.
+     *                        {@see \Ordinary\Log\JsonFormatter} output and as the `{channel}`
+     *                        placeholder in {@see \Ordinary\Log\TextFormatter}.
      * @param null|\Closure(\Closure(): void): void $dispatcher
      *                                                          When provided, each driver call is passed to this closure as a
      *                                                          zero-argument operation. Use this to queue writes onto an event
@@ -71,7 +72,7 @@ final class Logger implements LoggerInterface
      * Registers a processor that transforms every log item before dispatch.
      *
      * Processors run in registration order after the channel is stamped and
-     * before group/driver matching begins. Use {@see GenericCallableProcessor}
+     * before group/driver matching begins. Use {@see CallableProcessor}
      * to wrap an inline closure.
      */
     public function addProcessor(LogProcessorInterface $processor): void
@@ -174,12 +175,29 @@ final class Logger implements LoggerInterface
         }
     }
 
-    public function log(LogItemInterface $logItem): void
+    /**
+     * Returns a PSR-3 compatible adapter wrapping this logger.
+     *
+     * Use this when passing the logger to a library or framework that
+     * type-hints {@see \Psr\Log\LoggerInterface} rather than ordinary/log's
+     * native {@see LoggerInterface}.
+     *
+     * ```php
+     * $psrLogger = $logger->toPsr();
+     * $someLibrary->setLogger($psrLogger);
+     * ```
+     */
+    public function toPsr(): PsrLoggerAdapter
+    {
+        return new PsrLoggerAdapter($this);
+    }
+
+    public function log(LogEntryInterface $logItem): void
     {
         if ($this->channel !== '') {
             $context = $logItem->context;
-            $context[LogItemInterface::RESERVED_CHANNEL] = $this->channel;
-            $logItem = new GenericLogItem($logItem->level, $logItem->message, $logItem->dateTime, $context);
+            $context[LogEntryInterface::RESERVED_CHANNEL] = $this->channel;
+            $logItem = new LogEntry($logItem->level, $logItem->message, $logItem->dateTime, $context);
         }
 
         foreach ($this->processors as $processor) {
@@ -201,7 +219,7 @@ final class Logger implements LoggerInterface
         }
     }
 
-    private function invoke(LogDriverInterface $driver, LogItemInterface $logItem): void
+    private function invoke(LogDriverInterface $driver, LogEntryInterface $logItem): void
     {
         $operation = function () use ($driver, $logItem): void {
             try {

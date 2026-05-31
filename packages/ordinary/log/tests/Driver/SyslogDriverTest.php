@@ -6,7 +6,7 @@ namespace Ordinary\Log\Tests\Driver;
 
 use DateTimeImmutable;
 use Ordinary\Log\Driver\SyslogDriver;
-use Ordinary\Log\GenericLogItem;
+use Ordinary\Log\LogEntry;
 use Ordinary\Log\LogLevel;
 use Ordinary\Log\SynchronousDriverInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -29,7 +29,7 @@ final class SyslogDriverTest extends TestCase
         $driver = new SyslogDriver();
 
         foreach (LogLevel::cases() as $level) {
-            $driver->handleLog(new GenericLogItem($level, 'test message', new DateTimeImmutable()));
+            $driver->handleLog(new LogEntry($level, 'test message', new DateTimeImmutable()));
         }
 
         $this->addToAssertionCount(1);

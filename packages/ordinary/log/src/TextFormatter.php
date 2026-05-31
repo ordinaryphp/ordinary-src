@@ -5,28 +5,39 @@ declare(strict_types=1);
 namespace Ordinary\Log;
 
 /**
- * Interpolates {key} placeholders in the message string using the log item's
- * context, with {@see LogItemInterface::RESERVED_DATE} and
- * {@see LogItemInterface::RESERVED_LEVEL} injected automatically from the
- * supplied formatters.
+ * Produces a human-readable log line by interpolating `{key}` placeholders in
+ * the message string using the log item's context.
+ *
+ * {@see LogEntryInterface::RESERVED_DATE} and {@see LogEntryInterface::RESERVED_LEVEL}
+ * are injected automatically, so `{date}` and `{level}` are always available.
+ *
+ * Default output format:
+ * ```
+ * [{date}] [{level}] {message} {remaining context key=value pairs...}
+ * ```
+ *
+ * Example — with the default formatters and a `channel` stamped on the item:
+ * ```
+ * [2024-06-01T12:00:00Z] [error] Something failed order_id=ORD-999
+ * ```
  *
  * When an {@see ExceptionFormatterInterface} is provided, any Throwable value
- * in context — including {@see LogItemInterface::RESERVED_EXCEPTION} — is
+ * in context — including {@see LogEntryInterface::RESERVED_EXCEPTION} — is
  * formatted with full detail; otherwise the fallback is "ClassName: message".
  */
-final readonly class GenericLogFormatter implements LogFormatterInterface
+final readonly class TextFormatter implements LogFormatterInterface
 {
     public function __construct(
-        private DateTimeFormatterInterface $dateTimeFormatter = new GenericDateTimeFormatter(),
-        private LevelFormatterInterface $levelFormatter = new GenericLevelFormatter(),
+        private DateTimeFormatterInterface $dateTimeFormatter = new DateTimeFormatter(),
+        private LevelFormatterInterface $levelFormatter = new LevelFormatter(),
         private ?ExceptionFormatterInterface $exceptionFormatter = null,
     ) {}
 
-    public function formatLog(LogItemInterface $logItem): string
+    public function formatLog(LogEntryInterface $logItem): string
     {
         $context = $logItem->context;
-        $context[LogItemInterface::RESERVED_DATE] = $this->dateTimeFormatter->formatDate($logItem->dateTime);
-        $context[LogItemInterface::RESERVED_LEVEL] = $this->levelFormatter->formatLevel($logItem->level);
+        $context[LogEntryInterface::RESERVED_DATE] = $this->dateTimeFormatter->formatDate($logItem->dateTime);
+        $context[LogEntryInterface::RESERVED_LEVEL] = $this->levelFormatter->formatLevel($logItem->level);
 
         return $this->interpolate($logItem->message, $context);
     }

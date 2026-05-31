@@ -6,8 +6,8 @@ namespace Ordinary\Log\Tests\FailureHandler;
 
 use DateTimeImmutable;
 use Ordinary\Log\FailureHandler\ErrorLogFailureHandler;
-use Ordinary\Log\GenericLogItem;
 use Ordinary\Log\LogDriverInterface;
+use Ordinary\Log\LogEntry;
 use Ordinary\Log\LogFailureException;
 use Ordinary\Log\LogLevel;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -26,7 +26,7 @@ final class ErrorLogFailureHandlerTest extends TestCase
 
         try {
             $e = new LogFailureException(
-                new GenericLogItem(LogLevel::Error, 'msg', new DateTimeImmutable()),
+                new LogEntry(LogLevel::Error, 'msg', new DateTimeImmutable()),
                 new \RuntimeException('fail'),
             );
 
@@ -51,7 +51,7 @@ final class ErrorLogFailureHandlerTest extends TestCase
             $this->assertNotFalse($stream);
 
             $driver = $this->createStub(LogDriverInterface::class);
-            $logItem = new GenericLogItem(LogLevel::Error, 'connection lost', new DateTimeImmutable());
+            $logItem = new LogEntry(LogLevel::Error, 'connection lost', new DateTimeImmutable());
             $e = new LogFailureException($logItem, new \RuntimeException('timeout'), $driver);
 
             new ErrorLogFailureHandler()->handleLogFailure($e);

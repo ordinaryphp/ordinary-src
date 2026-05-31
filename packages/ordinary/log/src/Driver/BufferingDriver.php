@@ -8,7 +8,7 @@ use Ordinary\Log\FlushableInterface;
 use Ordinary\Log\LogBatch;
 use Ordinary\Log\LogBatchDriverInterface;
 use Ordinary\Log\LogDriverInterface;
-use Ordinary\Log\LogItemInterface;
+use Ordinary\Log\LogEntryInterface;
 
 /**
  * Accumulates log items in memory and dispatches them in bulk on flush.
@@ -34,7 +34,7 @@ use Ordinary\Log\LogItemInterface;
  */
 final class BufferingDriver implements LogDriverInterface, FlushableInterface
 {
-    /** @var list<LogItemInterface> */
+    /** @var list<LogEntryInterface> */
     private array $buffer = [];
 
     /**
@@ -47,7 +47,7 @@ final class BufferingDriver implements LogDriverInterface, FlushableInterface
         private readonly int $flushAfter = 0,
     ) {}
 
-    public function handleLog(LogItemInterface $logItem): void
+    public function handleLog(LogEntryInterface $logItem): void
     {
         $this->buffer[] = $logItem;
 

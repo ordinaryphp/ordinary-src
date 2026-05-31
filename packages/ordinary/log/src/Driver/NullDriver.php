@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Ordinary\Log\Driver;
 
-use Ordinary\Log\LogItemInterface;
+use Ordinary\Log\LogEntryInterface;
 use Ordinary\Log\SynchronousDriverInterface;
 
 /**
@@ -19,5 +19,5 @@ use Ordinary\Log\SynchronousDriverInterface;
  */
 final class NullDriver implements SynchronousDriverInterface
 {
-    public function handleLog(LogItemInterface $logItem): void {}
+    public function handleLog(LogEntryInterface $logItem): void {}
 }

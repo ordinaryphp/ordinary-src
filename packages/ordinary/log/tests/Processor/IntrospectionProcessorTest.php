@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Ordinary\Log\Tests\Processor;
 
 use DateTimeImmutable;
-use Ordinary\Log\GenericLogItem;
+use Ordinary\Log\LogEntry;
 use Ordinary\Log\Logger;
 use Ordinary\Log\LogLevel;
 use Ordinary\Log\Processor\IntrospectionProcessor;
@@ -20,7 +20,7 @@ final class IntrospectionProcessorTest extends TestCase
     public function it_adds_log_file_and_line_to_context(): void
     {
         $processor = new IntrospectionProcessor();
-        $item = new GenericLogItem(LogLevel::Info, 'msg', new DateTimeImmutable());
+        $item = new LogEntry(LogLevel::Info, 'msg', new DateTimeImmutable());
 
         $result = $processor->process($item);
 
@@ -34,7 +34,7 @@ final class IntrospectionProcessorTest extends TestCase
     public function it_records_this_test_file_as_call_site(): void
     {
         $processor = new IntrospectionProcessor();
-        $item = new GenericLogItem(LogLevel::Info, 'msg', new DateTimeImmutable());
+        $item = new LogEntry(LogLevel::Info, 'msg', new DateTimeImmutable());
 
         $result = $processor->process($item);
 
@@ -47,7 +47,7 @@ final class IntrospectionProcessorTest extends TestCase
     public function it_adds_log_class_and_function_when_called_from_method(): void
     {
         $processor = new IntrospectionProcessor();
-        $item = new GenericLogItem(LogLevel::Info, 'msg', new DateTimeImmutable());
+        $item = new LogEntry(LogLevel::Info, 'msg', new DateTimeImmutable());
 
         $result = $processor->process($item);
 
@@ -60,7 +60,7 @@ final class IntrospectionProcessorTest extends TestCase
     public function it_does_not_mutate_original_item(): void
     {
         $processor = new IntrospectionProcessor();
-        $item = new GenericLogItem(LogLevel::Info, 'msg', new DateTimeImmutable());
+        $item = new LogEntry(LogLevel::Info, 'msg', new DateTimeImmutable());
 
         $processor->process($item);
 
@@ -71,7 +71,7 @@ final class IntrospectionProcessorTest extends TestCase
     public function it_preserves_existing_context(): void
     {
         $processor = new IntrospectionProcessor();
-        $item = new GenericLogItem(LogLevel::Info, 'msg', new DateTimeImmutable(), ['user_id' => 7]);
+        $item = new LogEntry(LogLevel::Info, 'msg', new DateTimeImmutable(), ['user_id' => 7]);
 
         $result = $processor->process($item);
 
@@ -83,9 +83,9 @@ final class IntrospectionProcessorTest extends TestCase
     public function it_records_correct_call_site_when_called_from_logger(): void
     {
         $driver = new class implements \Ordinary\Log\LogDriverInterface {
-            public ?\Ordinary\Log\LogItemInterface $lastItem = null;
+            public ?\Ordinary\Log\LogEntryInterface $lastItem = null;
 
-            public function handleLog(\Ordinary\Log\LogItemInterface $logItem): void
+            public function handleLog(\Ordinary\Log\LogEntryInterface $logItem): void
             {
                 $this->lastItem = $logItem;
             }
@@ -109,7 +109,7 @@ final class IntrospectionProcessorTest extends TestCase
     public function it_skips_additional_namespaces(): void
     {
         $processor = new IntrospectionProcessor(skipNamespaces: [self::class]);
-        $item = new GenericLogItem(LogLevel::Info, 'msg', new DateTimeImmutable());
+        $item = new LogEntry(LogLevel::Info, 'msg', new DateTimeImmutable());
 
         $result = $processor->process($item);
 

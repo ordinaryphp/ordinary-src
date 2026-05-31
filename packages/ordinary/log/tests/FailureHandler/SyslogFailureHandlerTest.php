@@ -6,7 +6,7 @@ namespace Ordinary\Log\Tests\FailureHandler;
 
 use DateTimeImmutable;
 use Ordinary\Log\FailureHandler\SyslogFailureHandler;
-use Ordinary\Log\GenericLogItem;
+use Ordinary\Log\LogEntry;
 use Ordinary\Log\LogFailureException;
 use Ordinary\Log\LogLevel;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -20,7 +20,7 @@ final class SyslogFailureHandlerTest extends TestCase
     public function it_does_not_throw(): void
     {
         $e = new LogFailureException(
-            new GenericLogItem(LogLevel::Error, 'msg', new DateTimeImmutable()),
+            new LogEntry(LogLevel::Error, 'msg', new DateTimeImmutable()),
             new \RuntimeException('fail'),
         );
 

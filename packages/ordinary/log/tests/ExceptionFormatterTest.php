@@ -4,18 +4,18 @@ declare(strict_types=1);
 
 namespace Ordinary\Log\Tests;
 
-use Ordinary\Log\GenericExceptionFormatter;
+use Ordinary\Log\ExceptionFormatter;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(GenericExceptionFormatter::class)]
-final class GenericExceptionFormatterTest extends TestCase
+#[CoversClass(ExceptionFormatter::class)]
+final class ExceptionFormatterTest extends TestCase
 {
     #[Test]
     public function it_includes_class_message_code_and_location(): void
     {
-        $formatter = new GenericExceptionFormatter(includeTrace: false);
+        $formatter = new ExceptionFormatter(includeTrace: false);
         $e = new \RuntimeException('oops', 42);
 
         $result = $formatter->formatException($e);
@@ -29,7 +29,7 @@ final class GenericExceptionFormatterTest extends TestCase
     #[Test]
     public function it_includes_stack_trace_by_default(): void
     {
-        $formatter = new GenericExceptionFormatter();
+        $formatter = new ExceptionFormatter();
         $e = new \RuntimeException('trace test');
 
         $result = $formatter->formatException($e);
@@ -40,7 +40,7 @@ final class GenericExceptionFormatterTest extends TestCase
     #[Test]
     public function it_omits_trace_when_disabled(): void
     {
-        $formatter = new GenericExceptionFormatter(includeTrace: false);
+        $formatter = new ExceptionFormatter(includeTrace: false);
         $e = new \RuntimeException('no trace');
 
         $result = $formatter->formatException($e);
@@ -51,7 +51,7 @@ final class GenericExceptionFormatterTest extends TestCase
     #[Test]
     public function it_includes_previous_exception_chain(): void
     {
-        $formatter = new GenericExceptionFormatter(includeTrace: false);
+        $formatter = new ExceptionFormatter(includeTrace: false);
         $previous = new \InvalidArgumentException('root cause');
         $e = new \RuntimeException('outer', 0, $previous);
 
@@ -66,7 +66,7 @@ final class GenericExceptionFormatterTest extends TestCase
     #[Test]
     public function it_omits_previous_exception_when_disabled(): void
     {
-        $formatter = new GenericExceptionFormatter(includeTrace: false, includePrevious: false);
+        $formatter = new ExceptionFormatter(includeTrace: false, includePrevious: false);
         $previous = new \InvalidArgumentException('hidden cause');
         $e = new \RuntimeException('outer', 0, $previous);
 
@@ -79,7 +79,7 @@ final class GenericExceptionFormatterTest extends TestCase
     #[Test]
     public function it_limits_trace_depth(): void
     {
-        $formatter = new GenericExceptionFormatter(traceDepth: 2);
+        $formatter = new ExceptionFormatter(traceDepth: 2);
 
         $e = new \RuntimeException('deep');
 

@@ -9,7 +9,7 @@ use Psr\Clock\ClockInterface;
 
 /**
  * Provides default implementations for the named logging methods by
- * constructing a {@see GenericLogItem} and delegating to {@see self::log()}.
+ * constructing a {@see LogEntry} and delegating to {@see self::log()}.
  *
  * Classes using this trait must implement {@see LoggerInterface::log()}.
  * Assign {@see $clock} in the constructor to supply a custom timestamp source;
@@ -17,7 +17,7 @@ use Psr\Clock\ClockInterface;
  */
 trait LoggerTrait
 {
-    abstract public function log(LogItemInterface $logItem): void;
+    abstract public function log(LogEntryInterface $logItem): void;
 
     /**
      * Clock used to timestamp log items. Assign in the constructor to inject a
@@ -38,48 +38,48 @@ trait LoggerTrait
     /** @param array<string, mixed> $context */
     public function emergency(string $message, array $context = []): void
     {
-        $this->log(new GenericLogItem(LogLevel::Emergency, $message, $this->now(), $context));
+        $this->log(new LogEntry(LogLevel::Emergency, $message, $this->now(), $context));
     }
 
     /** @param array<string, mixed> $context */
     public function alert(string $message, array $context = []): void
     {
-        $this->log(new GenericLogItem(LogLevel::Alert, $message, $this->now(), $context));
+        $this->log(new LogEntry(LogLevel::Alert, $message, $this->now(), $context));
     }
 
     /** @param array<string, mixed> $context */
     public function critical(string $message, array $context = []): void
     {
-        $this->log(new GenericLogItem(LogLevel::Critical, $message, $this->now(), $context));
+        $this->log(new LogEntry(LogLevel::Critical, $message, $this->now(), $context));
     }
 
     /** @param array<string, mixed> $context */
     public function error(string $message, array $context = []): void
     {
-        $this->log(new GenericLogItem(LogLevel::Error, $message, $this->now(), $context));
+        $this->log(new LogEntry(LogLevel::Error, $message, $this->now(), $context));
     }
 
     /** @param array<string, mixed> $context */
     public function warning(string $message, array $context = []): void
     {
-        $this->log(new GenericLogItem(LogLevel::Warning, $message, $this->now(), $context));
+        $this->log(new LogEntry(LogLevel::Warning, $message, $this->now(), $context));
     }
 
     /** @param array<string, mixed> $context */
     public function notice(string $message, array $context = []): void
     {
-        $this->log(new GenericLogItem(LogLevel::Notice, $message, $this->now(), $context));
+        $this->log(new LogEntry(LogLevel::Notice, $message, $this->now(), $context));
     }
 
     /** @param array<string, mixed> $context */
     public function info(string $message, array $context = []): void
     {
-        $this->log(new GenericLogItem(LogLevel::Info, $message, $this->now(), $context));
+        $this->log(new LogEntry(LogLevel::Info, $message, $this->now(), $context));
     }
 
     /** @param array<string, mixed> $context */
     public function debug(string $message, array $context = []): void
     {
-        $this->log(new GenericLogItem(LogLevel::Debug, $message, $this->now(), $context));
+        $this->log(new LogEntry(LogLevel::Debug, $message, $this->now(), $context));
     }
 }

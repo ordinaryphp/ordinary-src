@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Ordinary\Log\Driver;
 
-use Ordinary\Log\GenericLogFormatter;
+use Ordinary\Log\LogEntryInterface;
 use Ordinary\Log\LogFormatterInterface;
-use Ordinary\Log\LogItemInterface;
 use Ordinary\Log\LogLevel;
 use Ordinary\Log\SynchronousDriverInterface;
+use Ordinary\Log\TextFormatter;
 
 /**
  * Writes formatted log events to the system logger via syslog().
@@ -27,7 +27,7 @@ use Ordinary\Log\SynchronousDriverInterface;
 final readonly class SyslogDriver implements SynchronousDriverInterface
 {
     public function __construct(
-        private LogFormatterInterface $formatter = new GenericLogFormatter(),
+        private LogFormatterInterface $formatter = new TextFormatter(),
         string $ident = '',
         int $facility = \LOG_USER,
         int $option = 0,
@@ -37,7 +37,7 @@ final readonly class SyslogDriver implements SynchronousDriverInterface
         }
     }
 
-    public function handleLog(LogItemInterface $logItem): void
+    public function handleLog(LogEntryInterface $logItem): void
     {
         \syslog($this->mapLevel($logItem->level), $this->formatter->formatLog($logItem));
     }

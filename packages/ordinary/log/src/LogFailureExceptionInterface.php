@@ -7,7 +7,7 @@ namespace Ordinary\Log;
 interface LogFailureExceptionInterface extends \Throwable
 {
     /** The log item that was being dispatched when the failure occurred. */
-    public LogItemInterface $logItem { get; }
+    public LogEntryInterface $logItem { get; }
 
     /**
      * The driver that threw, when the failure was reported by the Logger.

@@ -5,15 +5,15 @@ declare(strict_types=1);
 namespace Ordinary\Log\Tests;
 
 use DateTimeImmutable;
+use Ordinary\Log\CallableProcessor;
 use Ordinary\Log\FailureHandler\NoOpFailureHandler;
 use Ordinary\Log\FlushableInterface;
-use Ordinary\Log\GenericCallableProcessor;
-use Ordinary\Log\ImmutableLogItemInterface;
+use Ordinary\Log\ImmutableLogEntryInterface;
 use Ordinary\Log\LogDriverInterface;
+use Ordinary\Log\LogEntryInterface;
 use Ordinary\Log\LogFailureExceptionInterface;
 use Ordinary\Log\LogFailureHandlerInterface;
 use Ordinary\Log\Logger;
-use Ordinary\Log\LogItemInterface;
 use Ordinary\Log\LogLevel;
 use Ordinary\Log\LogProcessorInterface;
 use Ordinary\Log\Matcher\IsLevelOrHigher;
@@ -46,7 +46,7 @@ final class LoggerTest extends TestCase
     {
         $items = [];
         $driver = $this->createStub(LogDriverInterface::class);
-        $driver->method('handleLog')->willReturnCallback(function (LogItemInterface $item) use (&$items): void {
+        $driver->method('handleLog')->willReturnCallback(function (LogEntryInterface $item) use (&$items): void {
             $items[] = $item->level;
         });
 
@@ -267,7 +267,7 @@ final class LoggerTest extends TestCase
         $capturedItem = null;
 
         $driver = $this->createStub(LogDriverInterface::class);
-        $driver->method('handleLog')->willReturnCallback(function (LogItemInterface $item) use (&$capturedItem): void {
+        $driver->method('handleLog')->willReturnCallback(function (LogEntryInterface $item) use (&$capturedItem): void {
             $capturedItem = $item;
         });
 
@@ -275,8 +275,8 @@ final class LoggerTest extends TestCase
         $logger->add($driver);
         $logger->error('charge failed');
 
-        $this->assertInstanceOf(LogItemInterface::class, $capturedItem);
-        $this->assertSame('payment', $capturedItem->context[LogItemInterface::RESERVED_CHANNEL]);
+        $this->assertInstanceOf(LogEntryInterface::class, $capturedItem);
+        $this->assertSame('payment', $capturedItem->context[LogEntryInterface::RESERVED_CHANNEL]);
     }
 
     #[Test]
@@ -285,7 +285,7 @@ final class LoggerTest extends TestCase
         $capturedItem = null;
 
         $driver = $this->createStub(LogDriverInterface::class);
-        $driver->method('handleLog')->willReturnCallback(function (LogItemInterface $item) use (&$capturedItem): void {
+        $driver->method('handleLog')->willReturnCallback(function (LogEntryInterface $item) use (&$capturedItem): void {
             $capturedItem = $item;
         });
 
@@ -293,8 +293,8 @@ final class LoggerTest extends TestCase
         $logger->add($driver);
         $logger->info('test');
 
-        $this->assertInstanceOf(LogItemInterface::class, $capturedItem);
-        $this->assertArrayNotHasKey(LogItemInterface::RESERVED_CHANNEL, $capturedItem->context);
+        $this->assertInstanceOf(LogEntryInterface::class, $capturedItem);
+        $this->assertArrayNotHasKey(LogEntryInterface::RESERVED_CHANNEL, $capturedItem->context);
     }
 
     #[Test]
@@ -303,18 +303,18 @@ final class LoggerTest extends TestCase
         $capturedItem = null;
 
         $driver = $this->createStub(LogDriverInterface::class);
-        $driver->method('handleLog')->willReturnCallback(function (LogItemInterface $item) use (&$capturedItem): void {
+        $driver->method('handleLog')->willReturnCallback(function (LogEntryInterface $item) use (&$capturedItem): void {
             $capturedItem = $item;
         });
 
         $logger = new Logger(onFailure: new NoOpFailureHandler());
-        $logger->addProcessor(new GenericCallableProcessor(
-            fn(ImmutableLogItemInterface $item): ImmutableLogItemInterface => $item->withContext(['enriched' => true]),
+        $logger->addProcessor(new CallableProcessor(
+            fn(ImmutableLogEntryInterface $item): ImmutableLogEntryInterface => $item->withContext(['enriched' => true]),
         ));
         $logger->add($driver);
         $logger->info('test');
 
-        $this->assertInstanceOf(LogItemInterface::class, $capturedItem);
+        $this->assertInstanceOf(LogEntryInterface::class, $capturedItem);
         $this->assertTrue($capturedItem->context['enriched']);
     }
 
@@ -324,11 +324,11 @@ final class LoggerTest extends TestCase
         $order = [];
 
         $logger = new Logger(onFailure: new NoOpFailureHandler());
-        $logger->addProcessor(new GenericCallableProcessor(function (ImmutableLogItemInterface $item) use (&$order): ImmutableLogItemInterface {
+        $logger->addProcessor(new CallableProcessor(function (ImmutableLogEntryInterface $item) use (&$order): ImmutableLogEntryInterface {
             $order[] = 'first';
             return $item;
         }));
-        $logger->addProcessor(new GenericCallableProcessor(function (ImmutableLogItemInterface $item) use (&$order): ImmutableLogItemInterface {
+        $logger->addProcessor(new CallableProcessor(function (ImmutableLogEntryInterface $item) use (&$order): ImmutableLogEntryInterface {
             $order[] = 'second';
             return $item;
         }));
@@ -344,8 +344,8 @@ final class LoggerTest extends TestCase
         $channelSeenByProcessor = null;
 
         $logger = new Logger(channel: 'app', onFailure: new NoOpFailureHandler());
-        $logger->addProcessor(new GenericCallableProcessor(function (ImmutableLogItemInterface $item) use (&$channelSeenByProcessor): ImmutableLogItemInterface {
-            $channelSeenByProcessor = $item->context[LogItemInterface::RESERVED_CHANNEL] ?? null;
+        $logger->addProcessor(new CallableProcessor(function (ImmutableLogEntryInterface $item) use (&$channelSeenByProcessor): ImmutableLogEntryInterface {
+            $channelSeenByProcessor = $item->context[LogEntryInterface::RESERVED_CHANNEL] ?? null;
             return $item;
         }));
         $logger->add($this->createStub(LogDriverInterface::class));
@@ -440,7 +440,7 @@ final class LoggerTest extends TestCase
 
         $capturedItem = null;
         $driver = $this->createStub(LogDriverInterface::class);
-        $driver->method('handleLog')->willReturnCallback(function (LogItemInterface $item) use (&$capturedItem): void {
+        $driver->method('handleLog')->willReturnCallback(function (LogEntryInterface $item) use (&$capturedItem): void {
             $capturedItem = $item;
         });
 
@@ -448,8 +448,29 @@ final class LoggerTest extends TestCase
         $logger->add($driver);
         $logger->error('timed event');
 
-        $this->assertInstanceOf(LogItemInterface::class, $capturedItem);
+        $this->assertInstanceOf(LogEntryInterface::class, $capturedItem);
         $this->assertSame($fixedTime, $capturedItem->dateTime);
+    }
+
+    #[Test]
+    public function to_psr_delegates_to_the_underlying_logger(): void
+    {
+        $received = [];
+        $driver = $this->createMock(LogDriverInterface::class);
+        $driver->expects($this->once())
+            ->method('handleLog')
+            ->willReturnCallback(static function (LogEntryInterface $item) use (&$received): void {
+                $received[] = $item;
+            });
+
+        $logger = new Logger(onFailure: new NoOpFailureHandler());
+        $logger->add($driver);
+
+        $logger->toPsr()->info('psr message');
+
+        $this->assertCount(1, $received);
+        $this->assertSame('psr message', $received[0]->message);
+        $this->assertSame(LogLevel::Info, $received[0]->level);
     }
 
     #[Test]

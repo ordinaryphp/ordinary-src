@@ -6,18 +6,18 @@ namespace Ordinary\Log\Tests;
 
 use DateTimeImmutable;
 use DateTimeZone;
-use Ordinary\Log\GenericDateTimeFormatter;
+use Ordinary\Log\DateTimeFormatter;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(GenericDateTimeFormatter::class)]
-final class GenericDateTimeFormatterTest extends TestCase
+#[CoversClass(DateTimeFormatter::class)]
+final class DateTimeFormatterTest extends TestCase
 {
     #[Test]
     public function it_formats_with_default_atom_format_in_utc(): void
     {
-        $formatter = new GenericDateTimeFormatter();
+        $formatter = new DateTimeFormatter();
         $dt = new DateTimeImmutable('2024-06-01 12:00:00', new DateTimeZone('UTC'));
 
         $result = $formatter->formatDate($dt);
@@ -28,7 +28,7 @@ final class GenericDateTimeFormatterTest extends TestCase
     #[Test]
     public function it_formats_with_custom_format(): void
     {
-        $formatter = new GenericDateTimeFormatter('Y-m-d H:i:s');
+        $formatter = new DateTimeFormatter('Y-m-d H:i:s');
         $dt = new DateTimeImmutable('2024-06-01 12:00:00', new DateTimeZone('UTC'));
 
         $this->assertSame('2024-06-01 12:00:00', $formatter->formatDate($dt));
@@ -37,7 +37,7 @@ final class GenericDateTimeFormatterTest extends TestCase
     #[Test]
     public function it_converts_timezone_before_formatting(): void
     {
-        $formatter = new GenericDateTimeFormatter('H:i', 'America/New_York');
+        $formatter = new DateTimeFormatter('H:i', 'America/New_York');
         $dt = new DateTimeImmutable('2024-06-01 12:00:00', new DateTimeZone('UTC'));
 
         // UTC 12:00 is 08:00 in America/New_York (EDT, UTC-4)
@@ -48,7 +48,7 @@ final class GenericDateTimeFormatterTest extends TestCase
     public function it_accepts_datetimezone_object_directly(): void
     {
         $tz = new DateTimeZone('Europe/London');
-        $formatter = new GenericDateTimeFormatter('P', $tz);
+        $formatter = new DateTimeFormatter('P', $tz);
         $dt = new DateTimeImmutable('2024-01-01 00:00:00', new DateTimeZone('UTC'));
 
         // Europe/London is UTC+00:00 in winter

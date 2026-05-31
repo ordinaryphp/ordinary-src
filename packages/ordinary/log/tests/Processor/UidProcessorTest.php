@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Ordinary\Log\Tests\Processor;
 
 use DateTimeImmutable;
-use Ordinary\Log\GenericLogItem;
+use Ordinary\Log\LogEntry;
 use Ordinary\Log\LogLevel;
 use Ordinary\Log\Processor\UidProcessor;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -21,7 +21,7 @@ final class UidProcessorTest extends TestCase
     public function it_adds_uid_to_log_item(): void
     {
         $processor = new UidProcessor();
-        $item = new GenericLogItem(LogLevel::Info, 'msg', new DateTimeImmutable());
+        $item = new LogEntry(LogLevel::Info, 'msg', new DateTimeImmutable());
 
         $result = $processor->process($item);
 
@@ -33,7 +33,7 @@ final class UidProcessorTest extends TestCase
     public function uid_is_the_same_across_multiple_calls(): void
     {
         $processor = new UidProcessor();
-        $item = new GenericLogItem(LogLevel::Info, 'msg', new DateTimeImmutable());
+        $item = new LogEntry(LogLevel::Info, 'msg', new DateTimeImmutable());
 
         $first = $processor->process($item);
         $second = $processor->process($item);
@@ -54,7 +54,7 @@ final class UidProcessorTest extends TestCase
     public function get_uid_returns_the_same_uid_as_context(): void
     {
         $processor = new UidProcessor();
-        $item = new GenericLogItem(LogLevel::Info, 'msg', new DateTimeImmutable());
+        $item = new LogEntry(LogLevel::Info, 'msg', new DateTimeImmutable());
 
         $result = $processor->process($item);
 
@@ -88,7 +88,7 @@ final class UidProcessorTest extends TestCase
     public function custom_context_key_is_used(): void
     {
         $processor = new UidProcessor(contextKey: 'request_id');
-        $item = new GenericLogItem(LogLevel::Info, 'msg', new DateTimeImmutable());
+        $item = new LogEntry(LogLevel::Info, 'msg', new DateTimeImmutable());
 
         $result = $processor->process($item);
 
@@ -110,7 +110,7 @@ final class UidProcessorTest extends TestCase
     public function custom_generator_uid_appears_in_processed_item_context(): void
     {
         $processor = new UidProcessor(generator: static fn(): string => 'trace-abc');
-        $item = new GenericLogItem(LogLevel::Info, 'msg', new DateTimeImmutable());
+        $item = new LogEntry(LogLevel::Info, 'msg', new DateTimeImmutable());
 
         $result = $processor->process($item);
 

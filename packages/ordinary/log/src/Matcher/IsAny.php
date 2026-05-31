@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Ordinary\Log\Matcher;
 
-use Ordinary\Log\LogItemInterface;
+use Ordinary\Log\LogEntryInterface;
 use Ordinary\Log\LogMatcherInterface;
 
 final readonly class IsAny implements LogMatcherInterface
@@ -17,7 +17,7 @@ final readonly class IsAny implements LogMatcherInterface
         $this->matchers = \array_values($matchers);
     }
 
-    public function matches(LogItemInterface $logItem): bool
+    public function matches(LogEntryInterface $logItem): bool
     {
         return \array_any($this->matchers, fn($matcher) => $matcher->matches($logItem));
     }

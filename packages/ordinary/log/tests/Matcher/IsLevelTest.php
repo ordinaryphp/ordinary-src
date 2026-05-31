@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Ordinary\Log\Tests\Matcher;
 
 use DateTimeImmutable;
-use Ordinary\Log\GenericLogItem;
+use Ordinary\Log\LogEntry;
 use Ordinary\Log\LogLevel;
 use Ordinary\Log\Matcher\IsLevel;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -20,9 +20,9 @@ final class IsLevelTest extends TestCase
     {
         $matcher = new IsLevel(LogLevel::Error);
 
-        $this->assertTrue($matcher->matches(new GenericLogItem(LogLevel::Error, 'msg', new DateTimeImmutable())));
-        $this->assertFalse($matcher->matches(new GenericLogItem(LogLevel::Warning, 'msg', new DateTimeImmutable())));
-        $this->assertFalse($matcher->matches(new GenericLogItem(LogLevel::Critical, 'msg', new DateTimeImmutable())));
+        $this->assertTrue($matcher->matches(new LogEntry(LogLevel::Error, 'msg', new DateTimeImmutable())));
+        $this->assertFalse($matcher->matches(new LogEntry(LogLevel::Warning, 'msg', new DateTimeImmutable())));
+        $this->assertFalse($matcher->matches(new LogEntry(LogLevel::Critical, 'msg', new DateTimeImmutable())));
     }
 
     #[Test]
@@ -30,11 +30,11 @@ final class IsLevelTest extends TestCase
     {
         $matcher = new IsLevel(LogLevel::Warning, LogLevel::Error, LogLevel::Critical);
 
-        $this->assertTrue($matcher->matches(new GenericLogItem(LogLevel::Warning, 'msg', new DateTimeImmutable())));
-        $this->assertTrue($matcher->matches(new GenericLogItem(LogLevel::Error, 'msg', new DateTimeImmutable())));
-        $this->assertTrue($matcher->matches(new GenericLogItem(LogLevel::Critical, 'msg', new DateTimeImmutable())));
-        $this->assertFalse($matcher->matches(new GenericLogItem(LogLevel::Info, 'msg', new DateTimeImmutable())));
-        $this->assertFalse($matcher->matches(new GenericLogItem(LogLevel::Emergency, 'msg', new DateTimeImmutable())));
+        $this->assertTrue($matcher->matches(new LogEntry(LogLevel::Warning, 'msg', new DateTimeImmutable())));
+        $this->assertTrue($matcher->matches(new LogEntry(LogLevel::Error, 'msg', new DateTimeImmutable())));
+        $this->assertTrue($matcher->matches(new LogEntry(LogLevel::Critical, 'msg', new DateTimeImmutable())));
+        $this->assertFalse($matcher->matches(new LogEntry(LogLevel::Info, 'msg', new DateTimeImmutable())));
+        $this->assertFalse($matcher->matches(new LogEntry(LogLevel::Emergency, 'msg', new DateTimeImmutable())));
     }
 
     #[Test]
@@ -42,6 +42,6 @@ final class IsLevelTest extends TestCase
     {
         $matcher = new IsLevel();
 
-        $this->assertFalse($matcher->matches(new GenericLogItem(LogLevel::Debug, 'msg', new DateTimeImmutable())));
+        $this->assertFalse($matcher->matches(new LogEntry(LogLevel::Debug, 'msg', new DateTimeImmutable())));
     }
 }

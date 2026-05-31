@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Ordinary\Log\Processor;
 
-use Ordinary\Log\GenericLogItem;
-use Ordinary\Log\ImmutableLogItemInterface;
-use Ordinary\Log\LogItemInterface;
+use Ordinary\Log\ImmutableLogEntryInterface;
+use Ordinary\Log\LogEntry;
+use Ordinary\Log\LogEntryInterface;
 use Ordinary\Log\LogProcessorInterface;
 
 /**
@@ -30,13 +30,13 @@ final readonly class TagProcessor implements LogProcessorInterface
     /** @param array<string, mixed> $tags Key-value pairs stamped on every log item. */
     public function __construct(private array $tags) {}
 
-    public function process(LogItemInterface $logItem): LogItemInterface
+    public function process(LogEntryInterface $logItem): LogEntryInterface
     {
-        if ($logItem instanceof ImmutableLogItemInterface) {
+        if ($logItem instanceof ImmutableLogEntryInterface) {
             return $logItem->withContext($this->tags);
         }
 
-        return new GenericLogItem(
+        return new LogEntry(
             $logItem->level,
             $logItem->message,
             $logItem->dateTime,

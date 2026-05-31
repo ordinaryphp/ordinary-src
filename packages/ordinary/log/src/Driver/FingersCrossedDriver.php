@@ -6,7 +6,7 @@ namespace Ordinary\Log\Driver;
 
 use Ordinary\Log\FlushableInterface;
 use Ordinary\Log\LogDriverInterface;
-use Ordinary\Log\LogItemInterface;
+use Ordinary\Log\LogEntryInterface;
 use Ordinary\Log\LogLevel;
 
 /**
@@ -34,7 +34,7 @@ use Ordinary\Log\LogLevel;
  */
 final class FingersCrossedDriver implements LogDriverInterface, FlushableInterface
 {
-    /** @var list<LogItemInterface> */
+    /** @var list<LogEntryInterface> */
     private array $buffer = [];
     private bool $activated = false;
 
@@ -51,7 +51,7 @@ final class FingersCrossedDriver implements LogDriverInterface, FlushableInterfa
         private readonly bool $resetOnFlush = false,
     ) {}
 
-    public function handleLog(LogItemInterface $logItem): void
+    public function handleLog(LogEntryInterface $logItem): void
     {
         if ($this->activated) {
             $this->inner->handleLog($logItem);

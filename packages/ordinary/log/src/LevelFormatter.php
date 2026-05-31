@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Ordinary\Log;
 
-final readonly class GenericLevelFormatter implements LevelFormatterInterface
+final readonly class LevelFormatter implements LevelFormatterInterface
 {
     public function __construct(
         private bool $uppercase = false,

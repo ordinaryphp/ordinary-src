@@ -7,9 +7,9 @@ namespace Ordinary\Log\Tests\Driver;
 use DateTimeImmutable;
 use Ordinary\Log\Driver\FingersCrossedDriver;
 use Ordinary\Log\FlushableInterface;
-use Ordinary\Log\GenericLogItem;
 use Ordinary\Log\LogDriverInterface;
-use Ordinary\Log\LogItemInterface;
+use Ordinary\Log\LogEntry;
+use Ordinary\Log\LogEntryInterface;
 use Ordinary\Log\LogLevel;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
@@ -18,9 +18,9 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(FingersCrossedDriver::class)]
 final class FingersCrossedDriverTest extends TestCase
 {
-    private function item(LogLevel $level, string $message = 'msg'): GenericLogItem
+    private function item(LogLevel $level, string $message = 'msg'): LogEntry
     {
-        return new GenericLogItem($level, $message, new DateTimeImmutable());
+        return new LogEntry($level, $message, new DateTimeImmutable());
     }
 
     #[Test]
@@ -46,7 +46,7 @@ final class FingersCrossedDriverTest extends TestCase
     {
         $received = [];
         $inner = $this->createStub(LogDriverInterface::class);
-        $inner->method('handleLog')->willReturnCallback(function (LogItemInterface $item) use (&$received): void {
+        $inner->method('handleLog')->willReturnCallback(function (LogEntryInterface $item) use (&$received): void {
             $received[] = $item->message;
         });
 
@@ -64,7 +64,7 @@ final class FingersCrossedDriverTest extends TestCase
     {
         $received = [];
         $inner = $this->createStub(LogDriverInterface::class);
-        $inner->method('handleLog')->willReturnCallback(function (LogItemInterface $item) use (&$received): void {
+        $inner->method('handleLog')->willReturnCallback(function (LogEntryInterface $item) use (&$received): void {
             $received[] = $item->message;
         });
 
@@ -120,7 +120,7 @@ final class FingersCrossedDriverTest extends TestCase
     {
         $received = [];
         $inner = $this->createStub(LogDriverInterface::class);
-        $inner->method('handleLog')->willReturnCallback(function (LogItemInterface $item) use (&$received): void {
+        $inner->method('handleLog')->willReturnCallback(function (LogEntryInterface $item) use (&$received): void {
             $received[] = $item->message;
         });
 
@@ -142,7 +142,7 @@ final class FingersCrossedDriverTest extends TestCase
     {
         $received = [];
         $inner = $this->createStub(LogDriverInterface::class);
-        $inner->method('handleLog')->willReturnCallback(function (LogItemInterface $item) use (&$received): void {
+        $inner->method('handleLog')->willReturnCallback(function (LogEntryInterface $item) use (&$received): void {
             $received[] = $item->message;
         });
 

@@ -8,7 +8,7 @@ use DateTimeImmutable;
 use DateTimeInterface;
 use DateTimeZone;
 
-final class GenericDateTimeFormatter implements DateTimeFormatterInterface
+final class DateTimeFormatter implements DateTimeFormatterInterface
 {
     public private(set) DateTimeZone $timezone {
         set(DateTimeZone|string $value) {

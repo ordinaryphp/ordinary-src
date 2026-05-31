@@ -8,26 +8,26 @@ namespace Ordinary\Log;
  * Produces a JSON-encoded log entry with structured fields.
  *
  * When a channel is set on the {@see \Ordinary\Log\Logger}, it appears as the
- * first top-level `"channel"` field. The {@see LogItemInterface::RESERVED_EXCEPTION}
+ * first top-level `"channel"` field. The {@see LogEntryInterface::RESERVED_EXCEPTION}
  * context key, when present and holding a Throwable, is extracted and placed as a
  * top-level `"exception"` field. The original message template is preserved without
  * interpolation so log aggregators receive both the template and the full context.
  */
-final readonly class JsonLogFormatter implements LogFormatterInterface
+final readonly class JsonFormatter implements LogFormatterInterface
 {
     public function __construct(
-        private DateTimeFormatterInterface $dateTimeFormatter = new GenericDateTimeFormatter(),
-        private LevelFormatterInterface $levelFormatter = new GenericLevelFormatter(),
+        private DateTimeFormatterInterface $dateTimeFormatter = new DateTimeFormatter(),
+        private LevelFormatterInterface $levelFormatter = new LevelFormatter(),
         private ?ExceptionFormatterInterface $exceptionFormatter = null,
         private int $jsonFlags = \JSON_UNESCAPED_UNICODE | \JSON_UNESCAPED_SLASHES,
     ) {}
 
-    public function formatLog(LogItemInterface $logItem): string
+    public function formatLog(LogEntryInterface $logItem): string
     {
         $context = $logItem->context;
 
-        $channelField = $context[LogItemInterface::RESERVED_CHANNEL] ?? null;
-        unset($context[LogItemInterface::RESERVED_CHANNEL]);
+        $channelField = $context[LogEntryInterface::RESERVED_CHANNEL] ?? null;
+        unset($context[LogEntryInterface::RESERVED_CHANNEL]);
         $exceptionField = $this->extractException($context);
 
         $data = [];
@@ -58,17 +58,17 @@ final readonly class JsonLogFormatter implements LogFormatterInterface
      */
     private function extractException(array &$context): ?string
     {
-        if (!\array_key_exists(LogItemInterface::RESERVED_EXCEPTION, $context)) {
+        if (!\array_key_exists(LogEntryInterface::RESERVED_EXCEPTION, $context)) {
             return null;
         }
 
-        $value = $context[LogItemInterface::RESERVED_EXCEPTION];
+        $value = $context[LogEntryInterface::RESERVED_EXCEPTION];
 
         if (!($value instanceof \Throwable)) {
             return null;
         }
 
-        unset($context[LogItemInterface::RESERVED_EXCEPTION]);
+        unset($context[LogEntryInterface::RESERVED_EXCEPTION]);
 
         return $this->exceptionFormatter instanceof ExceptionFormatterInterface
             ? $this->exceptionFormatter->formatException($value)
@@ -117,6 +117,10 @@ final readonly class JsonLogFormatter implements LogFormatterInterface
             return $this->exceptionFormatter instanceof ExceptionFormatterInterface
                 ? $this->exceptionFormatter->formatException($value)
                 : \sprintf('%s: %s', $value::class, $value->getMessage());
+        }
+
+        if ($value instanceof \DateTimeInterface) {
+            return $value->format(\DateTimeInterface::ATOM);
         }
 
         if ($value instanceof \Stringable) {

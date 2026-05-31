@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Ordinary\Log\Driver;
 
-use Ordinary\Log\GenericLogFormatter;
+use Ordinary\Log\LogEntryInterface;
 use Ordinary\Log\LogFormatterInterface;
-use Ordinary\Log\LogItemInterface;
 use Ordinary\Log\SynchronousDriverInterface;
+use Ordinary\Log\TextFormatter;
 
 /**
  * Writes formatted log lines to a date-rotated file.
@@ -42,11 +42,11 @@ final class RotatingStreamDriver implements SynchronousDriverInterface
      */
     public function __construct(
         private readonly string $pathPattern,
-        private readonly LogFormatterInterface $formatter = new GenericLogFormatter(),
+        private readonly LogFormatterInterface $formatter = new TextFormatter(),
         private readonly string $dateFormat = 'Y-m-d',
     ) {}
 
-    public function handleLog(LogItemInterface $logItem): void
+    public function handleLog(LogEntryInterface $logItem): void
     {
         $date = $logItem->dateTime->format($this->dateFormat);
 

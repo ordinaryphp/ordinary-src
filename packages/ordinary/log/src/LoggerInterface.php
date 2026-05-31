@@ -30,5 +30,5 @@ interface LoggerInterface
     /** @param array<string, mixed> $context */
     public function debug(string $message, array $context = []): void;
 
-    public function log(LogItemInterface $logItem): void;
+    public function log(LogEntryInterface $logItem): void;
 }

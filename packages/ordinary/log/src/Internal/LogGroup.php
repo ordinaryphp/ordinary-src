@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Ordinary\Log\Internal;
 
 use Ordinary\Log\LogDriverInterface;
-use Ordinary\Log\LogItemInterface;
+use Ordinary\Log\LogEntryInterface;
 use Ordinary\Log\LogMatcherInterface;
 
 /**
@@ -21,7 +21,7 @@ final class LogGroup
         private readonly ?LogMatcherInterface $matcher = null,
     ) {}
 
-    public function matches(LogItemInterface $logItem): bool
+    public function matches(LogEntryInterface $logItem): bool
     {
         return !$this->matcher instanceof LogMatcherInterface || $this->matcher->matches($logItem);
     }

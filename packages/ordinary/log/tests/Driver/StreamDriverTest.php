@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace Ordinary\Log\Tests\Driver;
 
 use DateTimeImmutable;
+use Ordinary\Log\DateTimeFormatter;
 use Ordinary\Log\Driver\StreamDriver;
-use Ordinary\Log\GenericDateTimeFormatter;
-use Ordinary\Log\GenericLevelFormatter;
-use Ordinary\Log\GenericLogFormatter;
-use Ordinary\Log\GenericLogItem;
+use Ordinary\Log\LevelFormatter;
+use Ordinary\Log\LogEntry;
 use Ordinary\Log\LogFormatterInterface;
 use Ordinary\Log\LogLevel;
+use Ordinary\Log\TextFormatter;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
@@ -19,13 +19,13 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(StreamDriver::class)]
 final class StreamDriverTest extends TestCase
 {
-    private GenericLogFormatter $formatter;
+    private TextFormatter $formatter;
 
     protected function setUp(): void
     {
-        $this->formatter = new GenericLogFormatter(
-            new GenericDateTimeFormatter(),
-            new GenericLevelFormatter(),
+        $this->formatter = new TextFormatter(
+            new DateTimeFormatter(),
+            new LevelFormatter(),
         );
     }
 
@@ -36,7 +36,7 @@ final class StreamDriverTest extends TestCase
         $this->assertNotFalse($stream);
 
         $driver = new StreamDriver($stream, $this->formatter);
-        $driver->handleLog(new GenericLogItem(LogLevel::Info, 'test message', new DateTimeImmutable()));
+        $driver->handleLog(new LogEntry(LogLevel::Info, 'test message', new DateTimeImmutable()));
 
         \rewind($stream);
         $output = \stream_get_contents($stream);
@@ -54,8 +54,8 @@ final class StreamDriverTest extends TestCase
         $this->assertNotFalse($stream);
 
         $driver = new StreamDriver($stream, $this->formatter);
-        $driver->handleLog(new GenericLogItem(LogLevel::Info, 'first', new DateTimeImmutable()));
-        $driver->handleLog(new GenericLogItem(LogLevel::Info, 'second', new DateTimeImmutable()));
+        $driver->handleLog(new LogEntry(LogLevel::Info, 'first', new DateTimeImmutable()));
+        $driver->handleLog(new LogEntry(LogLevel::Info, 'second', new DateTimeImmutable()));
 
         \rewind($stream);
         $output = \stream_get_contents($stream);
@@ -75,7 +75,7 @@ final class StreamDriverTest extends TestCase
         $this->assertNotFalse($stream);
 
         $driver = new StreamDriver($stream);
-        $driver->handleLog(new GenericLogItem(LogLevel::Info, 'default formatter test', new DateTimeImmutable()));
+        $driver->handleLog(new LogEntry(LogLevel::Info, 'default formatter test', new DateTimeImmutable()));
 
         \rewind($stream);
         $output = \stream_get_contents($stream);
@@ -98,7 +98,7 @@ final class StreamDriverTest extends TestCase
 
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('format failed');
-        $driver->handleLog(new GenericLogItem(LogLevel::Info, 'msg', new DateTimeImmutable()));
+        $driver->handleLog(new LogEntry(LogLevel::Info, 'msg', new DateTimeImmutable()));
 
         \fclose($stream);
     }

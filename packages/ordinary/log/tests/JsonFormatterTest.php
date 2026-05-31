@@ -6,27 +6,27 @@ namespace Ordinary\Log\Tests;
 
 use DateTimeImmutable;
 use DateTimeZone;
-use Ordinary\Log\GenericDateTimeFormatter;
-use Ordinary\Log\GenericExceptionFormatter;
-use Ordinary\Log\GenericLevelFormatter;
-use Ordinary\Log\GenericLogItem;
-use Ordinary\Log\JsonLogFormatter;
-use Ordinary\Log\LogItemInterface;
+use Ordinary\Log\DateTimeFormatter;
+use Ordinary\Log\ExceptionFormatter;
+use Ordinary\Log\JsonFormatter;
+use Ordinary\Log\LevelFormatter;
+use Ordinary\Log\LogEntry;
+use Ordinary\Log\LogEntryInterface;
 use Ordinary\Log\LogLevel;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(JsonLogFormatter::class)]
-final class JsonLogFormatterTest extends TestCase
+#[CoversClass(JsonFormatter::class)]
+final class JsonFormatterTest extends TestCase
 {
-    private JsonLogFormatter $formatter;
+    private JsonFormatter $formatter;
 
     protected function setUp(): void
     {
-        $this->formatter = new JsonLogFormatter(
-            new GenericDateTimeFormatter('Y-m-d', 'UTC'),
-            new GenericLevelFormatter(),
+        $this->formatter = new JsonFormatter(
+            new DateTimeFormatter('Y-m-d', 'UTC'),
+            new LevelFormatter(),
         );
     }
 
@@ -42,7 +42,7 @@ final class JsonLogFormatterTest extends TestCase
     #[Test]
     public function it_produces_valid_json(): void
     {
-        $item = new GenericLogItem(LogLevel::Info, 'hello', new DateTimeImmutable());
+        $item = new LogEntry(LogLevel::Info, 'hello', new DateTimeImmutable());
 
         $result = $this->formatter->formatLog($item);
 
@@ -53,7 +53,7 @@ final class JsonLogFormatterTest extends TestCase
     public function it_includes_level_date_message_and_context_fields(): void
     {
         $dt = new DateTimeImmutable('2024-06-01', new DateTimeZone('UTC'));
-        $item = new GenericLogItem(LogLevel::Warning, 'Something happened', $dt, ['key' => 'value']);
+        $item = new LogEntry(LogLevel::Warning, 'Something happened', $dt, ['key' => 'value']);
 
         $data = $this->decode($this->formatter->formatLog($item));
 
@@ -66,7 +66,7 @@ final class JsonLogFormatterTest extends TestCase
     #[Test]
     public function it_preserves_raw_message_template_without_interpolation(): void
     {
-        $item = new GenericLogItem(LogLevel::Info, 'User {username} logged in', new DateTimeImmutable(), ['username' => 'john']);
+        $item = new LogEntry(LogLevel::Info, 'User {username} logged in', new DateTimeImmutable(), ['username' => 'john']);
 
         $data = $this->decode($this->formatter->formatLog($item));
 
@@ -78,8 +78,8 @@ final class JsonLogFormatterTest extends TestCase
     public function it_extracts_exception_to_top_level_field(): void
     {
         $e = new \RuntimeException('boom');
-        $item = new GenericLogItem(LogLevel::Error, 'Error occurred', new DateTimeImmutable())
-            ->withContext([LogItemInterface::RESERVED_EXCEPTION => $e]);
+        $item = new LogEntry(LogLevel::Error, 'Error occurred', new DateTimeImmutable())
+            ->withContext([LogEntryInterface::RESERVED_EXCEPTION => $e]);
 
         $data = $this->decode($this->formatter->formatLog($item));
 
@@ -88,21 +88,21 @@ final class JsonLogFormatterTest extends TestCase
         $this->assertStringContainsString('RuntimeException', $data['exception']);
         $context = $data['context'];
         $this->assertIsArray($context);
-        $this->assertArrayNotHasKey(LogItemInterface::RESERVED_EXCEPTION, $context);
+        $this->assertArrayNotHasKey(LogEntryInterface::RESERVED_EXCEPTION, $context);
     }
 
     #[Test]
     public function it_uses_exception_formatter_when_provided(): void
     {
-        $formatter = new JsonLogFormatter(
-            new GenericDateTimeFormatter(),
-            new GenericLevelFormatter(),
-            new GenericExceptionFormatter(includeTrace: false),
+        $formatter = new JsonFormatter(
+            new DateTimeFormatter(),
+            new LevelFormatter(),
+            new ExceptionFormatter(includeTrace: false),
         );
 
         $e = new \RuntimeException('detailed', 99);
-        $item = new GenericLogItem(LogLevel::Error, 'Error', new DateTimeImmutable())
-            ->withContext([LogItemInterface::RESERVED_EXCEPTION => $e]);
+        $item = new LogEntry(LogLevel::Error, 'Error', new DateTimeImmutable())
+            ->withContext([LogEntryInterface::RESERVED_EXCEPTION => $e]);
 
         $data = $this->decode($formatter->formatLog($item));
 
@@ -114,7 +114,7 @@ final class JsonLogFormatterTest extends TestCase
     #[Test]
     public function it_omits_exception_field_when_none_provided(): void
     {
-        $item = new GenericLogItem(LogLevel::Info, 'no exception', new DateTimeImmutable());
+        $item = new LogEntry(LogLevel::Info, 'no exception', new DateTimeImmutable());
 
         $data = $this->decode($this->formatter->formatLog($item));
 
@@ -124,11 +124,11 @@ final class JsonLogFormatterTest extends TestCase
     #[Test]
     public function non_throwable_exception_value_stays_in_context(): void
     {
-        $item = new GenericLogItem(
+        $item = new LogEntry(
             LogLevel::Info,
             'msg',
             new DateTimeImmutable(),
-            [LogItemInterface::RESERVED_EXCEPTION => 'just a string'],
+            [LogEntryInterface::RESERVED_EXCEPTION => 'just a string'],
         );
 
         $data = $this->decode($this->formatter->formatLog($item));
@@ -143,7 +143,7 @@ final class JsonLogFormatterTest extends TestCase
     #[Test]
     public function it_normalizes_bool_context_values(): void
     {
-        $item = new GenericLogItem(LogLevel::Debug, 'flags', new DateTimeImmutable(), ['t' => true, 'f' => false]);
+        $item = new LogEntry(LogLevel::Debug, 'flags', new DateTimeImmutable(), ['t' => true, 'f' => false]);
 
         $data = $this->decode($this->formatter->formatLog($item));
 
@@ -156,7 +156,7 @@ final class JsonLogFormatterTest extends TestCase
     #[Test]
     public function it_normalizes_null_context_values(): void
     {
-        $item = new GenericLogItem(LogLevel::Debug, 'null', new DateTimeImmutable(), ['v' => null]);
+        $item = new LogEntry(LogLevel::Debug, 'null', new DateTimeImmutable(), ['v' => null]);
 
         $data = $this->decode($this->formatter->formatLog($item));
 
@@ -168,7 +168,7 @@ final class JsonLogFormatterTest extends TestCase
     #[Test]
     public function it_normalizes_nan_float_to_string(): void
     {
-        $item = new GenericLogItem(LogLevel::Debug, 'nan', new DateTimeImmutable(), ['v' => \NAN]);
+        $item = new LogEntry(LogLevel::Debug, 'nan', new DateTimeImmutable(), ['v' => \NAN]);
 
         $data = $this->decode($this->formatter->formatLog($item));
 
@@ -180,7 +180,7 @@ final class JsonLogFormatterTest extends TestCase
     #[Test]
     public function it_normalizes_infinity_float_to_string(): void
     {
-        $item = new GenericLogItem(LogLevel::Debug, 'inf', new DateTimeImmutable(), ['v' => \INF]);
+        $item = new LogEntry(LogLevel::Debug, 'inf', new DateTimeImmutable(), ['v' => \INF]);
 
         $data = $this->decode($this->formatter->formatLog($item));
 
@@ -192,8 +192,8 @@ final class JsonLogFormatterTest extends TestCase
     #[Test]
     public function it_extracts_channel_as_first_top_level_field(): void
     {
-        $item = new GenericLogItem(LogLevel::Info, 'msg', new DateTimeImmutable())
-            ->withContext([LogItemInterface::RESERVED_CHANNEL => 'payment']);
+        $item = new LogEntry(LogLevel::Info, 'msg', new DateTimeImmutable())
+            ->withContext([LogEntryInterface::RESERVED_CHANNEL => 'payment']);
 
         $data = $this->decode($this->formatter->formatLog($item));
 
@@ -201,17 +201,54 @@ final class JsonLogFormatterTest extends TestCase
         $this->assertSame('channel', \array_key_first($data));
         $context = $data['context'];
         $this->assertIsArray($context);
-        $this->assertArrayNotHasKey(LogItemInterface::RESERVED_CHANNEL, $context);
+        $this->assertArrayNotHasKey(LogEntryInterface::RESERVED_CHANNEL, $context);
     }
 
     #[Test]
     public function it_omits_channel_field_when_not_set(): void
     {
-        $item = new GenericLogItem(LogLevel::Info, 'msg', new DateTimeImmutable());
+        $item = new LogEntry(LogLevel::Info, 'msg', new DateTimeImmutable());
 
         $data = $this->decode($this->formatter->formatLog($item));
 
         $this->assertArrayNotHasKey('channel', $data);
+    }
+
+    #[Test]
+    public function it_normalizes_datetime_interface_to_atom_string(): void
+    {
+        $dt = new DateTimeImmutable('2024-06-01T12:00:00+00:00');
+        $item = new LogEntry(LogLevel::Info, 'ts', new DateTimeImmutable(), ['ts' => $dt]);
+
+        $data = $this->decode($this->formatter->formatLog($item));
+
+        $context = $data['context'];
+        $this->assertIsArray($context);
+        $this->assertIsString($context['ts']);
+        $this->assertStringStartsWith('2024-06-01T12:00:00', $context['ts']);
+    }
+
+    #[Test]
+    public function it_normalizes_datetime_in_dedup_times_array(): void
+    {
+        $t1 = new DateTimeImmutable('2024-06-01T12:00:00+00:00');
+        $t2 = new DateTimeImmutable('2024-06-01T12:00:10+00:00');
+        $item = new LogEntry(
+            LogLevel::Error,
+            'msg',
+            new DateTimeImmutable(),
+            ['dedup_times' => [$t1, $t2]],
+        );
+
+        $data = $this->decode($this->formatter->formatLog($item));
+
+        $context = $data['context'];
+        $this->assertIsArray($context);
+        $times = $context['dedup_times'];
+        $this->assertIsArray($times);
+        $this->assertIsString($times[0]);
+        $this->assertIsString($times[1]);
+        $this->assertDoesNotMatchRegularExpression('/\[object/', $times[0]);
     }
 
     #[Test]
@@ -224,7 +261,7 @@ final class JsonLogFormatterTest extends TestCase
             }
         };
 
-        $item = new GenericLogItem(LogLevel::Info, 'obj', new DateTimeImmutable(), ['o' => $obj]);
+        $item = new LogEntry(LogLevel::Info, 'obj', new DateTimeImmutable(), ['o' => $obj]);
 
         $data = $this->decode($this->formatter->formatLog($item));
 

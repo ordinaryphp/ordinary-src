@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Ordinary\Log\Tests\Matcher;
 
 use DateTimeImmutable;
-use Ordinary\Log\GenericLogItem;
+use Ordinary\Log\LogEntry;
 use Ordinary\Log\LogLevel;
 use Ordinary\Log\Matcher\IsLevelOrHigher;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -34,7 +34,7 @@ final class IsLevelOrHigherTest extends TestCase
         LogLevel $threshold,
         bool $expected,
     ): void {
-        $item = new GenericLogItem($itemLevel, 'msg', new DateTimeImmutable());
+        $item = new LogEntry($itemLevel, 'msg', new DateTimeImmutable());
         $matcher = new IsLevelOrHigher($threshold);
 
         $this->assertSame($expected, $matcher->matches($item));

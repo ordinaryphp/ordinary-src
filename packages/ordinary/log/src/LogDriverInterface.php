@@ -6,5 +6,5 @@ namespace Ordinary\Log;
 
 interface LogDriverInterface
 {
-    public function handleLog(LogItemInterface $logItem): void;
+    public function handleLog(LogEntryInterface $logItem): void;
 }

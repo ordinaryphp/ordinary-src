@@ -6,7 +6,7 @@ namespace Ordinary\Log;
 
 use DateTimeInterface;
 
-final readonly class GenericLogItem implements ImmutableLogItemInterface
+final readonly class LogEntry implements ImmutableLogEntryInterface
 {
     /**
      * @param array<string, mixed> $context
@@ -37,7 +37,7 @@ final readonly class GenericLogItem implements ImmutableLogItemInterface
      * Returns a new instance with the given context entries merged in.
      *
      * All keys are accepted, including reserved ones such as
-     * {@see LogItemInterface::RESERVED_EXCEPTION}. Existing keys are overwritten
+     * {@see LogEntryInterface::RESERVED_EXCEPTION}. Existing keys are overwritten
      * by the incoming values.
      *
      * @param array<string, mixed> $context
@@ -46,5 +46,4 @@ final readonly class GenericLogItem implements ImmutableLogItemInterface
     {
         return clone($this, ['context' => \array_merge($this->context, $context)]);
     }
-
 }

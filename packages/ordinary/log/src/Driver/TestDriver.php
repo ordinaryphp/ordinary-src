@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Ordinary\Log\Driver;
 
 use Ordinary\Log\LogDriverInterface;
-use Ordinary\Log\LogItemInterface;
+use Ordinary\Log\LogEntryInterface;
 use Ordinary\Log\LogLevel;
 
 /**
@@ -27,10 +27,10 @@ use Ordinary\Log\LogLevel;
  */
 final class TestDriver implements LogDriverInterface
 {
-    /** @var list<LogItemInterface> All log items received since construction or last {@see reset()}. */
+    /** @var list<LogEntryInterface> All log items received since construction or last {@see reset()}. */
     public private(set) array $records = [];
 
-    public function handleLog(LogItemInterface $logItem): void
+    public function handleLog(LogEntryInterface $logItem): void
     {
         $this->records[] = $logItem;
     }
@@ -87,12 +87,12 @@ final class TestDriver implements LogDriverInterface
     /**
      * Returns all items recorded at the given level, in the order they were received.
      *
-     * @return list<LogItemInterface>
+     * @return list<LogEntryInterface>
      */
     public function getRecordsAtLevel(LogLevel $level): array
     {
         return \array_values(
-            \array_filter($this->records, fn(LogItemInterface $r): bool => $r->level === $level),
+            \array_filter($this->records, fn(LogEntryInterface $r): bool => $r->level === $level),
         );
     }
 }

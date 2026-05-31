@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Ordinary\Log\Tests;
 
 use DateTimeImmutable;
-use Ordinary\Log\GenericLogItem;
 use Ordinary\Log\LogBatch;
+use Ordinary\Log\LogEntry;
 use Ordinary\Log\LogLevel;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
@@ -18,8 +18,8 @@ final class LogBatchTest extends TestCase
     #[Test]
     public function it_holds_items_passed_to_the_factory(): void
     {
-        $a = new GenericLogItem(LogLevel::Info, 'first', new DateTimeImmutable());
-        $b = new GenericLogItem(LogLevel::Error, 'second', new DateTimeImmutable());
+        $a = new LogEntry(LogLevel::Info, 'first', new DateTimeImmutable());
+        $b = new LogEntry(LogLevel::Error, 'second', new DateTimeImmutable());
 
         $batch = LogBatch::of($a, $b);
 
@@ -30,8 +30,8 @@ final class LogBatchTest extends TestCase
     public function it_accepts_a_spread_list(): void
     {
         $items = [
-            new GenericLogItem(LogLevel::Info, 'a', new DateTimeImmutable()),
-            new GenericLogItem(LogLevel::Info, 'b', new DateTimeImmutable()),
+            new LogEntry(LogLevel::Info, 'a', new DateTimeImmutable()),
+            new LogEntry(LogLevel::Info, 'b', new DateTimeImmutable()),
         ];
 
         $batch = LogBatch::of(...$items);
@@ -42,7 +42,7 @@ final class LogBatchTest extends TestCase
     #[Test]
     public function it_accepts_a_single_item(): void
     {
-        $item = new GenericLogItem(LogLevel::Debug, 'lone', new DateTimeImmutable());
+        $item = new LogEntry(LogLevel::Debug, 'lone', new DateTimeImmutable());
 
         $batch = LogBatch::of($item);
 

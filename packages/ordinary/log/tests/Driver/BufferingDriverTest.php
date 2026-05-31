@@ -7,11 +7,11 @@ namespace Ordinary\Log\Tests\Driver;
 use DateTimeImmutable;
 use Ordinary\Log\Driver\BufferingDriver;
 use Ordinary\Log\FlushableInterface;
-use Ordinary\Log\GenericLogItem;
 use Ordinary\Log\LogBatch;
 use Ordinary\Log\LogBatchDriverInterface;
 use Ordinary\Log\LogDriverInterface;
-use Ordinary\Log\LogItemInterface;
+use Ordinary\Log\LogEntry;
+use Ordinary\Log\LogEntryInterface;
 use Ordinary\Log\LogLevel;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
@@ -20,9 +20,9 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(BufferingDriver::class)]
 final class BufferingDriverTest extends TestCase
 {
-    private function makeItem(string $message = 'msg', LogLevel $level = LogLevel::Info): GenericLogItem
+    private function makeItem(string $message = 'msg', LogLevel $level = LogLevel::Info): LogEntry
     {
-        return new GenericLogItem($level, $message, new DateTimeImmutable());
+        return new LogEntry($level, $message, new DateTimeImmutable());
     }
 
     #[Test]
@@ -48,7 +48,7 @@ final class BufferingDriverTest extends TestCase
         $received = [];
         $inner = $this->createStub(LogDriverInterface::class);
         $inner->method('handleLog')->willReturnCallback(
-            function (LogItemInterface $item) use (&$received): void {
+            function (LogEntryInterface $item) use (&$received): void {
                 $received[] = $item->message;
             },
         );
@@ -156,15 +156,15 @@ final class BufferingDriverTest extends TestCase
         $received = [];
         $inner = $this->createStub(LogDriverInterface::class);
         $inner->method('handleLog')->willReturnCallback(
-            function (LogItemInterface $item) use (&$received): void {
+            function (LogEntryInterface $item) use (&$received): void {
                 $received[] = $item->message;
             },
         );
 
         $run = function () use ($inner): void {
             $driver = new BufferingDriver($inner);
-            $driver->handleLog(new GenericLogItem(LogLevel::Info, 'alpha', new DateTimeImmutable()));
-            $driver->handleLog(new GenericLogItem(LogLevel::Info, 'beta', new DateTimeImmutable()));
+            $driver->handleLog(new LogEntry(LogLevel::Info, 'alpha', new DateTimeImmutable()));
+            $driver->handleLog(new LogEntry(LogLevel::Info, 'beta', new DateTimeImmutable()));
             // $driver goes out of scope → __destruct() → flush()
         };
         $run();

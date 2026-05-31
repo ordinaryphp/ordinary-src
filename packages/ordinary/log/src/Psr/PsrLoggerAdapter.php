@@ -12,7 +12,7 @@ use Psr\Log\LogLevel as PsrLogLevel;
  * Adapts an {@see LoggerInterface} to the PSR-3 {@see PsrLoggerInterface}.
  *
  * PSR-3 specifies that exceptions passed in context MUST use the key `"exception"`.
- * Because {@see \Ordinary\Log\LogItemInterface::RESERVED_EXCEPTION} is also `"exception"`,
+ * Because {@see \Ordinary\Log\LogEntryInterface::RESERVED_EXCEPTION} is also `"exception"`,
  * no translation is required — pass context as-is and formatters will handle the
  * Throwable correctly.
  *
@@ -108,7 +108,7 @@ final readonly class PsrLoggerAdapter implements PsrLoggerInterface
      * Casts a PSR-3 context array to the typed array expected by LoggerInterface.
      *
      * PSR-3 uses `"exception"` for Throwable context, which matches
-     * {@see \Ordinary\Log\LogItemInterface::RESERVED_EXCEPTION} directly — no key
+     * {@see \Ordinary\Log\LogEntryInterface::RESERVED_EXCEPTION} directly — no key
      * translation is needed.
      *
      * @param array<mixed> $context

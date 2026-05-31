@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Ordinary\Log\Processor;
 
-use Ordinary\Log\GenericLogItem;
-use Ordinary\Log\ImmutableLogItemInterface;
-use Ordinary\Log\LogItemInterface;
+use Ordinary\Log\ImmutableLogEntryInterface;
+use Ordinary\Log\LogEntry;
+use Ordinary\Log\LogEntryInterface;
 use Ordinary\Log\LogProcessorInterface;
 
 /**
@@ -33,7 +33,7 @@ final readonly class MemoryUsageProcessor implements LogProcessorInterface
         private bool $includePeak = false,
     ) {}
 
-    public function process(LogItemInterface $logItem): LogItemInterface
+    public function process(LogEntryInterface $logItem): LogEntryInterface
     {
         $context = ['memory.usage' => \memory_get_usage($this->realUsage)];
 
@@ -41,11 +41,11 @@ final readonly class MemoryUsageProcessor implements LogProcessorInterface
             $context['memory.peak_usage'] = \memory_get_peak_usage($this->realUsage);
         }
 
-        if ($logItem instanceof ImmutableLogItemInterface) {
+        if ($logItem instanceof ImmutableLogEntryInterface) {
             return $logItem->withContext($context);
         }
 
-        return new GenericLogItem(
+        return new LogEntry(
             $logItem->level,
             $logItem->message,
             $logItem->dateTime,

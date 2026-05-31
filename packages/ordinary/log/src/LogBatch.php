@@ -15,7 +15,7 @@ namespace Ordinary\Log;
 final readonly class LogBatch
 {
     /**
-     * @param list<LogItemInterface> $items
+     * @param list<LogEntryInterface> $items
      */
     private function __construct(
         public array $items,
@@ -26,7 +26,7 @@ final readonly class LogBatch
      *
      * @throws \InvalidArgumentException if called with no arguments
      */
-    public static function of(LogItemInterface ...$logs): self
+    public static function of(LogEntryInterface ...$logs): self
     {
         if ($logs === []) {
             throw new \InvalidArgumentException('LogBatch must contain at least one item');

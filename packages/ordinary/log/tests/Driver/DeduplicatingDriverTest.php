@@ -7,9 +7,9 @@ namespace Ordinary\Log\Tests\Driver;
 use DateTimeImmutable;
 use Ordinary\Log\Driver\DeduplicatingDriver;
 use Ordinary\Log\FlushableInterface;
-use Ordinary\Log\GenericLogItem;
 use Ordinary\Log\LogDriverInterface;
-use Ordinary\Log\LogItemInterface;
+use Ordinary\Log\LogEntry;
+use Ordinary\Log\LogEntryInterface;
 use Ordinary\Log\LogLevel;
 use Ordinary\Log\Tests\Support\MutableClock;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -20,9 +20,9 @@ use PHPUnit\Framework\TestCase;
 final class DeduplicatingDriverTest extends TestCase
 {
     /** @param array<string, mixed> $context */
-    private function makeItem(string $message = 'msg', LogLevel $level = LogLevel::Error, array $context = []): GenericLogItem
+    private function makeItem(string $message = 'msg', LogLevel $level = LogLevel::Error, array $context = []): LogEntry
     {
-        return new GenericLogItem($level, $message, new DateTimeImmutable(), $context);
+        return new LogEntry($level, $message, new DateTimeImmutable(), $context);
     }
 
     private function makeClock(string $time = '2024-01-01T00:00:00Z'): MutableClock
@@ -35,7 +35,7 @@ final class DeduplicatingDriverTest extends TestCase
     {
         $received = [];
         $inner = $this->createStub(LogDriverInterface::class);
-        $inner->method('handleLog')->willReturnCallback(function (LogItemInterface $item) use (&$received): void {
+        $inner->method('handleLog')->willReturnCallback(function (LogEntryInterface $item) use (&$received): void {
             $received[] = $item;
         });
 
@@ -71,7 +71,7 @@ final class DeduplicatingDriverTest extends TestCase
     {
         $received = [];
         $inner = $this->createStub(LogDriverInterface::class);
-        $inner->method('handleLog')->willReturnCallback(function (LogItemInterface $item) use (&$received): void {
+        $inner->method('handleLog')->willReturnCallback(function (LogEntryInterface $item) use (&$received): void {
             $received[] = $item;
         });
 
@@ -100,7 +100,7 @@ final class DeduplicatingDriverTest extends TestCase
     {
         $received = [];
         $inner = $this->createStub(LogDriverInterface::class);
-        $inner->method('handleLog')->willReturnCallback(function (LogItemInterface $item) use (&$received): void {
+        $inner->method('handleLog')->willReturnCallback(function (LogEntryInterface $item) use (&$received): void {
             $received[] = $item;
         });
 
@@ -130,7 +130,7 @@ final class DeduplicatingDriverTest extends TestCase
     {
         $received = [];
         $inner = $this->createStub(LogDriverInterface::class);
-        $inner->method('handleLog')->willReturnCallback(function (LogItemInterface $item) use (&$received): void {
+        $inner->method('handleLog')->willReturnCallback(function (LogEntryInterface $item) use (&$received): void {
             $received[] = $item;
         });
 
@@ -199,13 +199,13 @@ final class DeduplicatingDriverTest extends TestCase
     {
         $received = [];
         $inner = $this->createStub(LogDriverInterface::class);
-        $inner->method('handleLog')->willReturnCallback(function (LogItemInterface $item) use (&$received): void {
+        $inner->method('handleLog')->willReturnCallback(function (LogEntryInterface $item) use (&$received): void {
             $received[] = $item;
         });
 
         $driver = new DeduplicatingDriver(
             $inner,
-            fingerprint: fn(LogItemInterface $item): string => 'fixed-key',
+            fingerprint: fn(LogEntryInterface $item): string => 'fixed-key',
         );
         $driver->handleLog($this->makeItem('first message'));
         $driver->handleLog($this->makeItem('completely different message'));
@@ -221,7 +221,7 @@ final class DeduplicatingDriverTest extends TestCase
     {
         $received = [];
         $inner = $this->createStub(LogDriverInterface::class);
-        $inner->method('handleLog')->willReturnCallback(function (LogItemInterface $item) use (&$received): void {
+        $inner->method('handleLog')->willReturnCallback(function (LogEntryInterface $item) use (&$received): void {
             $received[] = $item;
         });
 
@@ -245,7 +245,7 @@ final class DeduplicatingDriverTest extends TestCase
     {
         $received = [];
         $inner = $this->createStub(LogDriverInterface::class);
-        $inner->method('handleLog')->willReturnCallback(function (LogItemInterface $item) use (&$received): void {
+        $inner->method('handleLog')->willReturnCallback(function (LogEntryInterface $item) use (&$received): void {
             $received[] = $item;
         });
 
@@ -309,14 +309,14 @@ final class DeduplicatingDriverTest extends TestCase
     {
         $received = [];
         $inner = $this->createStub(LogDriverInterface::class);
-        $inner->method('handleLog')->willReturnCallback(function (LogItemInterface $item) use (&$received): void {
+        $inner->method('handleLog')->willReturnCallback(function (LogEntryInterface $item) use (&$received): void {
             $received[] = $item;
         });
 
         $run = function () use ($inner): void {
             $driver = new DeduplicatingDriver($inner, windowSeconds: 60);
-            $driver->handleLog(new GenericLogItem(LogLevel::Error, 'msg', new DateTimeImmutable()));
-            $driver->handleLog(new GenericLogItem(LogLevel::Error, 'msg', new DateTimeImmutable()));
+            $driver->handleLog(new LogEntry(LogLevel::Error, 'msg', new DateTimeImmutable()));
+            $driver->handleLog(new LogEntry(LogLevel::Error, 'msg', new DateTimeImmutable()));
             // $driver goes out of scope → __destruct() → flush()
         };
         $run();

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Ordinary\Log\Matcher;
 
-use Ordinary\Log\LogItemInterface;
+use Ordinary\Log\LogEntryInterface;
 use Ordinary\Log\LogMatcherInterface;
 
 /**
@@ -13,17 +13,17 @@ use Ordinary\Log\LogMatcherInterface;
  * Use this when you need a quick inline matcher without defining a dedicated class:
  *
  * ```php
- * $logger->add($driver, matcher: new GenericCallableMatcher(
- *     fn(LogItemInterface $item) => isset($item->context['user_id']),
+ * $logger->add($driver, matcher: new CallableMatcher(
+ *     fn(LogEntryInterface $item) => isset($item->context['user_id']),
  * ));
  * ```
  */
-final readonly class GenericCallableMatcher implements LogMatcherInterface
+final readonly class CallableMatcher implements LogMatcherInterface
 {
-    /** @param \Closure(LogItemInterface): bool $matcher */
+    /** @param \Closure(LogEntryInterface): bool $matcher */
     public function __construct(private \Closure $matcher) {}
 
-    public function matches(LogItemInterface $logItem): bool
+    public function matches(LogEntryInterface $logItem): bool
     {
         return ($this->matcher)($logItem);
     }

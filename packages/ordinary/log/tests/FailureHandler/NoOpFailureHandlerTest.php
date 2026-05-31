@@ -6,7 +6,7 @@ namespace Ordinary\Log\Tests\FailureHandler;
 
 use DateTimeImmutable;
 use Ordinary\Log\FailureHandler\NoOpFailureHandler;
-use Ordinary\Log\GenericLogItem;
+use Ordinary\Log\LogEntry;
 use Ordinary\Log\LogFailureException;
 use Ordinary\Log\LogLevel;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -21,7 +21,7 @@ final class NoOpFailureHandlerTest extends TestCase
     {
         $handler = new NoOpFailureHandler();
         $e = new LogFailureException(
-            new GenericLogItem(LogLevel::Error, 'msg', new DateTimeImmutable()),
+            new LogEntry(LogLevel::Error, 'msg', new DateTimeImmutable()),
             new \RuntimeException('fail'),
         );
 

@@ -6,7 +6,7 @@ namespace Ordinary\Log\Tests\Driver;
 
 use DateTimeImmutable;
 use Ordinary\Log\Driver\NullDriver;
-use Ordinary\Log\GenericLogItem;
+use Ordinary\Log\LogEntry;
 use Ordinary\Log\LogLevel;
 use Ordinary\Log\SynchronousDriverInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -22,7 +22,7 @@ final class NullDriverTest extends TestCase
         $driver = new NullDriver();
 
         $this->expectNotToPerformAssertions();
-        $driver->handleLog(new GenericLogItem(LogLevel::Error, 'discarded', new DateTimeImmutable()));
+        $driver->handleLog(new LogEntry(LogLevel::Error, 'discarded', new DateTimeImmutable()));
     }
 
     #[Test]

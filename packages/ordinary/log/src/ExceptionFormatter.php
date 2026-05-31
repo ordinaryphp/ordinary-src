@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Ordinary\Log;
 
-final readonly class GenericExceptionFormatter implements ExceptionFormatterInterface
+final readonly class ExceptionFormatter implements ExceptionFormatterInterface
 {
     public function __construct(
         private bool $includeTrace = true,
