@@ -19,7 +19,7 @@ cs-check: ## Check code style
 	vendor/bin/php-cs-fixer check
 
 stan: ## Run PHPStan static analysis
-	vendor/bin/phpstan analyse
+	vendor/bin/phpstan analyse --memory-limit=-1
 
 psalm: ## Run Psalm static analysis
 	vendor/bin/psalm
