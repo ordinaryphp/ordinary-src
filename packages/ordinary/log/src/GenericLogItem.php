@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Ordinary\Log;
 
 use DateTimeInterface;
-use InvalidArgumentException;
 
 final readonly class GenericLogItem implements ImmutableLogItemInterface
 {
@@ -35,46 +34,16 @@ final readonly class GenericLogItem implements ImmutableLogItemInterface
     }
 
     /**
-     * Returns a new instance with the given user-context entries merged in.
+     * Returns a new instance with the given context entries merged in.
      *
-     * Rejects any reserved key — use {@see self::withReservedContext()} for those.
+     * All keys are accepted, including reserved ones such as
+     * {@see LogItemInterface::RESERVED_EXCEPTION}. Existing keys are overwritten
+     * by the incoming values.
      *
      * @param array<string, mixed> $context
-     *
-     * @throws InvalidArgumentException when $context contains any reserved key
      */
     public function withContext(array $context): static
     {
-        foreach (self::RESERVED_KEYS as $key) {
-            if (\array_key_exists($key, $context)) {
-                throw new InvalidArgumentException(
-                    \sprintf('"%s" is a reserved context key', $key),
-                );
-            }
-        }
-
-        return clone($this, ['context' => \array_merge($this->context, $context)]);
-    }
-
-    /**
-     * Returns a new instance with the given reserved-context entries merged in.
-     *
-     * Only keys listed in {@see LogItemInterface::RESERVED_KEYS} are accepted.
-     *
-     * @param array<string, mixed> $context
-     *
-     * @throws InvalidArgumentException when $context contains a non-reserved key
-     */
-    public function withReservedContext(array $context): static
-    {
-        foreach (\array_keys($context) as $key) {
-            if (!\in_array($key, self::RESERVED_KEYS, true)) {
-                throw new InvalidArgumentException(
-                    \sprintf('"%s" is not a reserved context key', $key),
-                );
-            }
-        }
-
         return clone($this, ['context' => \array_merge($this->context, $context)]);
     }
 

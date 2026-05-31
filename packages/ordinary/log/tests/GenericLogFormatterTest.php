@@ -42,7 +42,7 @@ final class GenericLogFormatterTest extends TestCase
     public function it_injects_formatted_date_via_reserved_key(): void
     {
         $dt = new DateTimeImmutable('2024-03-15', new DateTimeZone('UTC'));
-        $item = new GenericLogItem(LogLevel::Info, 'Date: {@date}', $dt);
+        $item = new GenericLogItem(LogLevel::Info, 'Date: {date}', $dt);
 
         $this->assertSame('Date: 2024-03-15', $this->formatter->formatLog($item));
     }
@@ -50,7 +50,7 @@ final class GenericLogFormatterTest extends TestCase
     #[Test]
     public function it_injects_formatted_level_via_reserved_key(): void
     {
-        $item = new GenericLogItem(LogLevel::Warning, 'Level: {@level}', new DateTimeImmutable());
+        $item = new GenericLogItem(LogLevel::Warning, 'Level: {level}', new DateTimeImmutable());
 
         $this->assertSame('Level: warning', $this->formatter->formatLog($item));
     }
@@ -76,8 +76,8 @@ final class GenericLogFormatterTest extends TestCase
         );
 
         $exception = new \RuntimeException('something broke');
-        $item = new GenericLogItem(LogLevel::Error, '{@exception}', new DateTimeImmutable())
-            ->withReservedContext([LogItemInterface::RESERVED_EXCEPTION => $exception]);
+        $item = new GenericLogItem(LogLevel::Error, '{exception}', new DateTimeImmutable())
+            ->withContext([LogItemInterface::RESERVED_EXCEPTION => $exception]);
 
         $result = $formatter->formatLog($item);
 

@@ -32,6 +32,10 @@ interface ImmutableLogItemInterface extends LogItemInterface
     /**
      * Returns a new instance with the given context entries merged in.
      *
+     * All keys are accepted, including reserved ones such as
+     * {@see LogItemInterface::RESERVED_EXCEPTION}. Existing keys are overwritten
+     * by the incoming values.
+     *
      * @param array<string, mixed> $context
      */
     public function withContext(array $context): static;

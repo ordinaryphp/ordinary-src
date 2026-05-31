@@ -5,18 +5,16 @@ declare(strict_types=1);
 namespace Ordinary\Log\Psr;
 
 use Ordinary\Log\LoggerInterface;
-use Ordinary\Log\LogItemInterface;
 use Psr\Log\LoggerInterface as PsrLoggerInterface;
 use Psr\Log\LogLevel as PsrLogLevel;
 
 /**
  * Adapts an {@see LoggerInterface} to the PSR-3 {@see PsrLoggerInterface}.
  *
- * PSR-3 specifies that an exception passed in context MUST use the key
- * {@see https://www.php-fig.org/psr/psr-3/#13-context "exception"}. This adapter
- * automatically translates that key to {@see LogItemInterface::RESERVED_EXCEPTION}
- * so formatters handle it correctly. Non-Throwable values under "exception" are
- * left as-is.
+ * PSR-3 specifies that exceptions passed in context MUST use the key `"exception"`.
+ * Because {@see \Ordinary\Log\LogItemInterface::RESERVED_EXCEPTION} is also `"exception"`,
+ * no translation is required — pass context as-is and formatters will handle the
+ * Throwable correctly.
  *
  * Obtain an instance via the concrete logger rather than depending on this
  * adapter directly; it exists solely for interoperability with PSR-3 consumers.
@@ -30,49 +28,49 @@ final readonly class PsrLoggerAdapter implements PsrLoggerInterface
     /** @param array<mixed> $context */
     public function emergency(\Stringable|string $message, array $context = []): void
     {
-        $this->logger->emergency((string) $message, $this->translateContext($context));
+        $this->logger->emergency((string) $message, $this->castContext($context));
     }
 
     /** @param array<mixed> $context */
     public function alert(\Stringable|string $message, array $context = []): void
     {
-        $this->logger->alert((string) $message, $this->translateContext($context));
+        $this->logger->alert((string) $message, $this->castContext($context));
     }
 
     /** @param array<mixed> $context */
     public function critical(\Stringable|string $message, array $context = []): void
     {
-        $this->logger->critical((string) $message, $this->translateContext($context));
+        $this->logger->critical((string) $message, $this->castContext($context));
     }
 
     /** @param array<mixed> $context */
     public function error(\Stringable|string $message, array $context = []): void
     {
-        $this->logger->error((string) $message, $this->translateContext($context));
+        $this->logger->error((string) $message, $this->castContext($context));
     }
 
     /** @param array<mixed> $context */
     public function warning(\Stringable|string $message, array $context = []): void
     {
-        $this->logger->warning((string) $message, $this->translateContext($context));
+        $this->logger->warning((string) $message, $this->castContext($context));
     }
 
     /** @param array<mixed> $context */
     public function notice(\Stringable|string $message, array $context = []): void
     {
-        $this->logger->notice((string) $message, $this->translateContext($context));
+        $this->logger->notice((string) $message, $this->castContext($context));
     }
 
     /** @param array<mixed> $context */
     public function info(\Stringable|string $message, array $context = []): void
     {
-        $this->logger->info((string) $message, $this->translateContext($context));
+        $this->logger->info((string) $message, $this->castContext($context));
     }
 
     /** @param array<mixed> $context */
     public function debug(\Stringable|string $message, array $context = []): void
     {
-        $this->logger->debug((string) $message, $this->translateContext($context));
+        $this->logger->debug((string) $message, $this->castContext($context));
     }
 
     /**
@@ -89,7 +87,7 @@ final readonly class PsrLoggerAdapter implements PsrLoggerInterface
         }
 
         $msg = (string) $message;
-        $ctx = $this->translateContext($context);
+        $ctx = $this->castContext($context);
 
         match ($level) {
             PsrLogLevel::EMERGENCY => $this->logger->emergency($msg, $ctx),
@@ -107,23 +105,19 @@ final readonly class PsrLoggerAdapter implements PsrLoggerInterface
     }
 
     /**
-     * Translates the PSR-3 "exception" context key to {@see LogItemInterface::RESERVED_EXCEPTION}.
+     * Casts a PSR-3 context array to the typed array expected by LoggerInterface.
      *
-     * Only Throwable values are translated; non-Throwable values under "exception" are
-     * passed through unchanged so they appear as regular context in the log output.
+     * PSR-3 uses `"exception"` for Throwable context, which matches
+     * {@see \Ordinary\Log\LogItemInterface::RESERVED_EXCEPTION} directly — no key
+     * translation is needed.
      *
      * @param array<mixed> $context
      *
      * @return array<string, mixed>
      */
-    private function translateContext(array $context): array
+    private function castContext(array $context): array
     {
         /** @var array<string, mixed> $context */
-        if (\array_key_exists('exception', $context) && $context['exception'] instanceof \Throwable) {
-            $context[LogItemInterface::RESERVED_EXCEPTION] = $context['exception'];
-            unset($context['exception']);
-        }
-
         return $context;
     }
 }

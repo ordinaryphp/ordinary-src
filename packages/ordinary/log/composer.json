@@ -11,10 +11,14 @@
   "require": {
     "php": "^8.5",
     "psr/clock": "^1.0",
+    "psr/http-message": "^2.0",
     "psr/log": "^3.0"
   },
   "require-dev": {
     "aws/aws-sdk-php": "^3.0",
+    "phpstan/phpstan": "^2.1",
+    "phpstan/phpstan-phpunit": "^2.0",
+    "phpstan/phpstan-strict-rules": "^2.0",
     "phpunit/phpunit": "^13.0"
   },
   "suggest": {

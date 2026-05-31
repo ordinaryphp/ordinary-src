@@ -79,7 +79,7 @@ final class JsonLogFormatterTest extends TestCase
     {
         $e = new \RuntimeException('boom');
         $item = new GenericLogItem(LogLevel::Error, 'Error occurred', new DateTimeImmutable())
-            ->withReservedContext([LogItemInterface::RESERVED_EXCEPTION => $e]);
+            ->withContext([LogItemInterface::RESERVED_EXCEPTION => $e]);
 
         $data = $this->decode($this->formatter->formatLog($item));
 
@@ -102,7 +102,7 @@ final class JsonLogFormatterTest extends TestCase
 
         $e = new \RuntimeException('detailed', 99);
         $item = new GenericLogItem(LogLevel::Error, 'Error', new DateTimeImmutable())
-            ->withReservedContext([LogItemInterface::RESERVED_EXCEPTION => $e]);
+            ->withContext([LogItemInterface::RESERVED_EXCEPTION => $e]);
 
         $data = $this->decode($formatter->formatLog($item));
 
@@ -119,6 +119,25 @@ final class JsonLogFormatterTest extends TestCase
         $data = $this->decode($this->formatter->formatLog($item));
 
         $this->assertArrayNotHasKey('exception', $data);
+    }
+
+    #[Test]
+    public function non_throwable_exception_value_stays_in_context(): void
+    {
+        $item = new GenericLogItem(
+            LogLevel::Info,
+            'msg',
+            new DateTimeImmutable(),
+            [LogItemInterface::RESERVED_EXCEPTION => 'just a string'],
+        );
+
+        $data = $this->decode($this->formatter->formatLog($item));
+
+        $this->assertArrayNotHasKey('exception', $data);
+        $context = $data['context'];
+        $this->assertIsArray($context);
+        $this->assertArrayHasKey('exception', $context);
+        $this->assertSame('just a string', $context['exception']);
     }
 
     #[Test]
@@ -174,7 +193,7 @@ final class JsonLogFormatterTest extends TestCase
     public function it_extracts_channel_as_first_top_level_field(): void
     {
         $item = new GenericLogItem(LogLevel::Info, 'msg', new DateTimeImmutable())
-            ->withReservedContext([LogItemInterface::RESERVED_CHANNEL => 'payment']);
+            ->withContext([LogItemInterface::RESERVED_CHANNEL => 'payment']);
 
         $data = $this->decode($this->formatter->formatLog($item));
 

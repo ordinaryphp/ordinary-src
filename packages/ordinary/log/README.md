@@ -138,6 +138,75 @@ A typical output sequence for three occurrences of the same log within the windo
 [error] Payment failed  dedup_count=2  dedup_times=[...]  ← flushed at window close
 ```
 
+### RotatingStreamDriver
+
+Writes to a date-rotated file. The file path is built by substituting `{date}` in the path pattern with the formatted date of each log item. A new file is opened automatically whenever the date changes:
+
+```php
+use Ordinary\Log\Driver\RotatingStreamDriver;
+use Ordinary\Log\JsonLogFormatter;
+
+$logger->add(new RotatingStreamDriver(
+    pathPattern: '/var/log/app-{date}.log',
+    formatter: new JsonLogFormatter(),
+));
+// Produces: /var/log/app-2024-06-01.log, /var/log/app-2024-06-02.log, …
+```
+
+Use `$dateFormat` to control rotation granularity — `'Y-m-d'` (default) for daily, `'Y-m-d-H'` for hourly.
+
+### FingersCrossedDriver
+
+Buffers all log items silently until one at or above the activation level arrives, then flushes the entire buffer to the inner driver. This gives full diagnostic context around errors without log noise during normal operation:
+
+```php
+use Ordinary\Log\Driver\FingersCrossedDriver;
+use Ordinary\Log\Driver\StreamDriver;
+use Ordinary\Log\LogLevel;
+
+$logger->add(new FingersCrossedDriver(
+    inner: new StreamDriver(fopen('/var/log/app.log', 'a')),
+    activationLevel: LogLevel::Error,
+));
+```
+
+After activation all subsequent items go directly to the inner driver. If the threshold is never reached, `flush()` discards the buffer silently.
+
+Options:
+- `$maxBuffer` — cap buffer size (drops oldest item when full); 0 = unlimited.
+- `$resetOnFlush` — return to buffering state after each `flush()`, for request-scoped use.
+
+### NullDriver
+
+Silently discards every log item. Useful as a placeholder or to explicitly disable a group during tests:
+
+```php
+use Ordinary\Log\Driver\NullDriver;
+
+$logger->add(new NullDriver());
+```
+
+### TestDriver
+
+Collects all log items in memory. Use it in tests to assert on what was logged without touching real I/O:
+
+```php
+use Ordinary\Log\Driver\TestDriver;
+use Ordinary\Log\LogLevel;
+
+$driver = new TestDriver();
+$logger->add($driver);
+
+$service->processPayment($order); // triggers $logger->error(...)
+
+$this->assertTrue($driver->hasRecordThatContains('Payment failed', LogLevel::Error));
+$this->assertTrue($driver->hasRecord(LogLevel::Error, 'Payment failed'));
+$this->assertTrue($driver->hasRecordAtLevel(LogLevel::Error));
+
+$errors = $driver->getRecordsAtLevel(LogLevel::Error); // list<LogItemInterface>
+$driver->reset(); // clear between test cases
+```
+
 ### Composing decorators
 
 Decorators compose: wrap one inside another and call `Logger::flush()` once — the cascade propagates automatically.
@@ -203,6 +272,136 @@ Constraints:
 - Group IDs must be unique — `addGroup()` throws if the ID already exists.
 - `removeGroup('default')` throws — the default group cannot be removed.
 - `add()` throws if the specified group does not exist.
+
+---
+
+## Processors
+
+Processors transform log items before they are dispatched to drivers. Register them with `addProcessor()` — they run in registration order after the channel is stamped.
+
+### TagProcessor
+
+Stamps a fixed set of key-value pairs on every log item:
+
+```php
+use Ordinary\Log\Processor\TagProcessor;
+
+$logger->addProcessor(new TagProcessor([
+    'env'     => 'production',
+    'release' => 'v2.3.1',
+    'service' => 'payment-api',
+]));
+```
+
+### UidProcessor
+
+Generates a unique identifier at construction time and adds it to every log item. Create a new instance per request to correlate all log entries for a single operation:
+
+```php
+use Ordinary\Log\Processor\UidProcessor;
+
+$logger->addProcessor(new UidProcessor());                           // 'uid' — 7 hex chars
+$logger->addProcessor(new UidProcessor('request_id', length: 16));  // custom key + length
+
+// Bring your own generator — must return a non-empty string
+$logger->addProcessor(new UidProcessor(generator: fn () => Uuid::v4()->toString()));
+```
+
+Throws `\UnexpectedValueException` at construction if the generator returns an empty string.
+
+### MemoryUsageProcessor
+
+Adds the current memory usage (in bytes) to every log item:
+
+```php
+use Ordinary\Log\Processor\MemoryUsageProcessor;
+
+$logger->addProcessor(new MemoryUsageProcessor());                   // adds 'memory.usage'
+$logger->addProcessor(new MemoryUsageProcessor(includePeak: true));  // also 'memory.peak_usage'
+$logger->addProcessor(new MemoryUsageProcessor(realUsage: true));    // system-allocated bytes
+```
+
+### WebProcessor
+
+Adds HTTP request details to every log item. Supply a PSR-7 `ServerRequestInterface`
+or a raw server params array — nothing is read from globals:
+
+```php
+use Ordinary\Log\Processor\WebProcessor;
+
+// PSR-7 request: native methods used first, server params as fallback
+$logger->addProcessor(new WebProcessor($psrRequest));
+// Adds: request.url, request.ip, request.method, request.server, request.referrer, request.user_agent
+
+// Raw server params array (useful in tests or CLI scripts)
+$logger->addProcessor(new WebProcessor(['REQUEST_URI' => '/test', 'REMOTE_ADDR' => '127.0.0.1']));
+
+// Include additional server param keys
+$logger->addProcessor(new WebProcessor($psrRequest, extraFields: ['HTTP_X_REQUEST_ID']));
+// Also adds: request.http_x_request_id
+```
+
+When a PSR-7 request is provided, URL and method come from `getUri()` / `getMethod()`,
+headers from `getHeaderLine()`, and IP / extra fields from `getServerParams()`. Passing
+`null` (the default) adds no context.
+
+### IntrospectionProcessor
+
+Adds the file, line, class, and function of the actual log call site by inspecting the call stack:
+
+```php
+use Ordinary\Log\Processor\IntrospectionProcessor;
+
+$logger->addProcessor(new IntrospectionProcessor());
+// Adds: log.file, log.line, log.class, log.function
+```
+
+If your application wraps ordinary/log in its own logger class, exclude that namespace from the walk:
+
+```php
+$logger->addProcessor(new IntrospectionProcessor(skipNamespaces: ['App\\Logging\\']));
+```
+
+### GenericCallableProcessor
+
+Wraps a closure as a processor for one-off transformations:
+
+```php
+use Ordinary\Log\GenericCallableProcessor;
+
+$logger->addProcessor(new GenericCallableProcessor(
+    fn(ImmutableLogItemInterface $item) => $item->withContext(['request_id' => $requestId]),
+));
+```
+
+### Creating a custom processor
+
+Implement `LogProcessorInterface` with a single `process()` method:
+
+```php
+use Ordinary\Log\ImmutableLogItemInterface;
+use Ordinary\Log\LogItemInterface;
+use Ordinary\Log\LogProcessorInterface;
+
+final class TenantProcessor implements LogProcessorInterface
+{
+    public function __construct(private readonly string $tenantId) {}
+
+    public function process(LogItemInterface $logItem): LogItemInterface
+    {
+        if ($logItem instanceof ImmutableLogItemInterface) {
+            return $logItem->withContext(['tenant_id' => $this->tenantId]);
+        }
+
+        return new \Ordinary\Log\GenericLogItem(
+            $logItem->level,
+            $logItem->message,
+            $logItem->dateTime,
+            \array_merge($logItem->context, ['tenant_id' => $this->tenantId]),
+        );
+    }
+}
+```
 
 ---
 
@@ -523,4 +722,14 @@ $psrLogger = new PsrLoggerAdapter($logger);
 
 // Compatible with any library that typehints Psr\Log\LoggerInterface
 $psrLogger->error('Something failed', ['context' => 'value']);
+```
+
+PSR-3 specifies that Throwables in context must be passed under the key `"exception"`. Because `LogItemInterface::RESERVED_EXCEPTION` is also `"exception"`, no translation is required — use the key directly in both the native API and the PSR-3 adapter:
+
+```php
+// Native API — passes through to formatters unchanged
+$logger->error('Charge failed', ['exception' => $e, 'order_id' => 'ORD-1']);
+
+// PSR-3 API — same key, same behavior
+$psrLogger->error('Charge failed', ['exception' => $e, 'order_id' => 'ORD-1']);
 ```

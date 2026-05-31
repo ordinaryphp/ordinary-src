@@ -49,7 +49,10 @@ final readonly class JsonLogFormatter implements LogFormatterInterface
     }
 
     /**
-     * Extracts and formats the reserved exception key from context (mutates the array).
+     * Extracts and formats a Throwable under the exception key from context.
+     *
+     * Only Throwable values are extracted; non-Throwable values under the same key
+     * remain in context and appear in the `context` object as regular fields.
      *
      * @param array<string, mixed> $context
      */
@@ -60,11 +63,12 @@ final readonly class JsonLogFormatter implements LogFormatterInterface
         }
 
         $value = $context[LogItemInterface::RESERVED_EXCEPTION];
-        unset($context[LogItemInterface::RESERVED_EXCEPTION]);
 
         if (!($value instanceof \Throwable)) {
             return null;
         }
+
+        unset($context[LogItemInterface::RESERVED_EXCEPTION]);
 
         return $this->exceptionFormatter instanceof ExceptionFormatterInterface
             ? $this->exceptionFormatter->formatException($value)

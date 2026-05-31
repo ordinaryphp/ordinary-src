@@ -6,7 +6,6 @@ namespace Ordinary\Log\Tests;
 
 use DateTimeImmutable;
 use DateTimeZone;
-use InvalidArgumentException;
 use Ordinary\Log\GenericLogItem;
 use Ordinary\Log\LogItemInterface;
 use Ordinary\Log\LogLevel;
@@ -71,22 +70,11 @@ final class GenericLogItemTest extends TestCase
     }
 
     #[Test]
-    public function with_context_throws_on_reserved_key(): void
-    {
-        $item = new GenericLogItem(LogLevel::Info, 'msg', new DateTimeImmutable());
-
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage(LogItemInterface::RESERVED_EXCEPTION);
-
-        $item->withContext([LogItemInterface::RESERVED_EXCEPTION => new \RuntimeException()]);
-    }
-
-    #[Test]
-    public function with_reserved_context_sets_exception_key_immutably(): void
+    public function with_context_accepts_reserved_exception_key(): void
     {
         $e = new \RuntimeException('oops');
-        $original = new GenericLogItem(LogLevel::Error, 'Something broke: {@exception}', new DateTimeImmutable());
-        $updated = $original->withReservedContext([LogItemInterface::RESERVED_EXCEPTION => $e]);
+        $original = new GenericLogItem(LogLevel::Error, 'Something broke', new DateTimeImmutable());
+        $updated = $original->withContext([LogItemInterface::RESERVED_EXCEPTION => $e]);
 
         $this->assertSame([], $original->context);
         $this->assertArrayHasKey(LogItemInterface::RESERVED_EXCEPTION, $updated->context);
@@ -94,23 +82,12 @@ final class GenericLogItemTest extends TestCase
     }
 
     #[Test]
-    public function with_reserved_context_preserves_existing_user_context(): void
-    {
-        $e = new \RuntimeException('oops');
-        $item = new GenericLogItem(LogLevel::Error, 'msg', new DateTimeImmutable(), ['user' => 'alice']);
-        $updated = $item->withReservedContext([LogItemInterface::RESERVED_EXCEPTION => $e]);
-
-        $this->assertSame('alice', $updated->context['user']);
-        $this->assertArrayHasKey(LogItemInterface::RESERVED_EXCEPTION, $updated->context);
-    }
-
-    #[Test]
-    public function with_reserved_context_accepts_any_reserved_key(): void
+    public function with_context_accepts_any_reserved_key(): void
     {
         $item = new GenericLogItem(LogLevel::Info, 'msg', new DateTimeImmutable());
-        $updated = $item->withReservedContext([
-            LogItemInterface::RESERVED_DATE => '2024-01-01',
-            LogItemInterface::RESERVED_LEVEL => 'info',
+        $updated = $item->withContext([
+            LogItemInterface::RESERVED_DATE      => '2024-01-01',
+            LogItemInterface::RESERVED_LEVEL     => 'info',
             LogItemInterface::RESERVED_EXCEPTION => new \RuntimeException(),
         ]);
 
@@ -120,30 +97,26 @@ final class GenericLogItemTest extends TestCase
     }
 
     #[Test]
-    public function with_reserved_context_throws_on_non_reserved_key(): void
+    public function with_context_preserves_existing_context_when_adding_exception(): void
     {
-        $item = new GenericLogItem(LogLevel::Info, 'msg', new DateTimeImmutable());
+        $e = new \RuntimeException('oops');
+        $item = new GenericLogItem(LogLevel::Error, 'msg', new DateTimeImmutable(), ['user' => 'alice']);
+        $updated = $item->withContext([LogItemInterface::RESERVED_EXCEPTION => $e]);
 
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('user_key');
-
-        $item->withReservedContext(['user_key' => 'value']);
+        $this->assertSame('alice', $updated->context['user']);
+        $this->assertArrayHasKey(LogItemInterface::RESERVED_EXCEPTION, $updated->context);
     }
 
     #[Test]
-    public function reserved_constants_are_defined_on_interface(): void
+    public function reserved_constants_use_psr3_compatible_names(): void
     {
-        // @phpstan-ignore method.alreadyNarrowedType
-        $this->assertSame('@date', LogItemInterface::RESERVED_DATE);
-        // @phpstan-ignore method.alreadyNarrowedType
-        $this->assertSame('@level', LogItemInterface::RESERVED_LEVEL);
-        // @phpstan-ignore method.alreadyNarrowedType
-        $this->assertSame('@exception', LogItemInterface::RESERVED_EXCEPTION);
-        // @phpstan-ignore method.alreadyNarrowedType
-        $this->assertSame('@exception.message', LogItemInterface::RESERVED_EXCEPTION_MESSAGE);
-        // @phpstan-ignore method.alreadyNarrowedType
-        $this->assertSame('@exception.line', LogItemInterface::RESERVED_EXCEPTION_LINE);
-        // @phpstan-ignore method.alreadyNarrowedType
-        $this->assertSame('@exception.code', LogItemInterface::RESERVED_EXCEPTION_CODE);
+        $constants = (new \ReflectionClass(LogItemInterface::class))->getConstants();
+        $this->assertSame('date', $constants['RESERVED_DATE']);
+        $this->assertSame('level', $constants['RESERVED_LEVEL']);
+        $this->assertSame('exception', $constants['RESERVED_EXCEPTION']);
+        $this->assertSame('exception.message', $constants['RESERVED_EXCEPTION_MESSAGE']);
+        $this->assertSame('exception.line', $constants['RESERVED_EXCEPTION_LINE']);
+        $this->assertSame('exception.code', $constants['RESERVED_EXCEPTION_CODE']);
+        $this->assertSame('channel', $constants['RESERVED_CHANNEL']);
     }
 }

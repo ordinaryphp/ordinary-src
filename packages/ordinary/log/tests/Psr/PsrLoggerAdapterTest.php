@@ -17,7 +17,7 @@ use Psr\Log\LogLevel as PsrLogLevel;
 final class PsrLoggerAdapterTest extends TestCase
 {
     #[Test]
-    public function it_translates_psr_exception_key_to_reserved_key(): void
+    public function it_passes_psr3_exception_key_directly_to_inner_logger(): void
     {
         $exception = new \RuntimeException('something went wrong');
         $capturedContext = null;
@@ -34,11 +34,10 @@ final class PsrLoggerAdapterTest extends TestCase
         $this->assertIsArray($capturedContext);
         $this->assertArrayHasKey(LogItemInterface::RESERVED_EXCEPTION, $capturedContext);
         $this->assertSame($exception, $capturedContext[LogItemInterface::RESERVED_EXCEPTION]);
-        $this->assertArrayNotHasKey('exception', $capturedContext);
     }
 
     #[Test]
-    public function it_does_not_translate_non_throwable_exception_values(): void
+    public function it_passes_non_throwable_exception_value_through_unchanged(): void
     {
         $capturedContext = null;
 
@@ -54,11 +53,10 @@ final class PsrLoggerAdapterTest extends TestCase
         $this->assertIsArray($capturedContext);
         $this->assertArrayHasKey('exception', $capturedContext);
         $this->assertSame('just a string', $capturedContext['exception']);
-        $this->assertArrayNotHasKey(LogItemInterface::RESERVED_EXCEPTION, $capturedContext);
     }
 
     #[Test]
-    public function exception_translation_applies_to_all_named_methods(): void
+    public function exception_context_passes_through_all_named_methods(): void
     {
         $exception = new \RuntimeException('fail');
         $methods = ['emergency', 'alert', 'critical', 'error', 'warning', 'notice', 'info', 'debug'];
@@ -79,7 +77,7 @@ final class PsrLoggerAdapterTest extends TestCase
             $this->assertArrayHasKey(
                 LogItemInterface::RESERVED_EXCEPTION,
                 $capturedContext ?? [],
-                \sprintf('Method %s() did not translate the exception key', $method),
+                \sprintf('Method %s() did not pass the exception key', $method),
             );
         }
     }
@@ -114,7 +112,7 @@ final class PsrLoggerAdapterTest extends TestCase
     }
 
     #[Test]
-    public function log_translates_exception_key_via_log_method(): void
+    public function log_passes_exception_context_via_log_method(): void
     {
         $exception = new \RuntimeException('fail');
         $capturedContext = null;
@@ -130,7 +128,7 @@ final class PsrLoggerAdapterTest extends TestCase
 
         $this->assertIsArray($capturedContext);
         $this->assertArrayHasKey(LogItemInterface::RESERVED_EXCEPTION, $capturedContext);
-        $this->assertArrayNotHasKey('exception', $capturedContext);
+        $this->assertSame($exception, $capturedContext[LogItemInterface::RESERVED_EXCEPTION]);
     }
 
     #[Test]
