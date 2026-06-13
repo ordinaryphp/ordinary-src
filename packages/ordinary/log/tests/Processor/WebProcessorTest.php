@@ -92,7 +92,7 @@ final class WebProcessorTest extends TestCase
         $request->method('getHeaderLine')->willReturn('');
         $request->method('getServerParams')->willReturn(['SERVER_NAME' => 'fallback.example.com']);
 
-        $result = (new WebProcessor($request))->process(
+        $result = new WebProcessor($request)->process(
             new LogEntry(LogLevel::Info, 'msg', new DateTimeImmutable()),
         );
 
@@ -152,7 +152,7 @@ final class WebProcessorTest extends TestCase
             'HTTP_REFERER'   => 'https://fallback.example.com',
         ]);
 
-        $result = (new WebProcessor($request))->process(
+        $result = new WebProcessor($request)->process(
             new LogEntry(LogLevel::Info, 'msg', new DateTimeImmutable()),
         );
 
@@ -175,7 +175,7 @@ final class WebProcessorTest extends TestCase
         $request->method('getServerParams')->willReturn([]);
 
         $item = new LogEntry(LogLevel::Info, 'msg', new DateTimeImmutable(), ['a' => 1]);
-        $result = (new WebProcessor($request))->process($item);
+        $result = new WebProcessor($request)->process($item);
 
         $this->assertSame($item, $result);
     }
@@ -206,7 +206,7 @@ final class WebProcessorTest extends TestCase
     #[Test]
     public function it_skips_missing_array_fields(): void
     {
-        $result = (new WebProcessor(['REQUEST_URI' => '/test']))->process(
+        $result = new WebProcessor(['REQUEST_URI' => '/test'])->process(
             new LogEntry(LogLevel::Info, 'msg', new DateTimeImmutable()),
         );
 
@@ -230,7 +230,7 @@ final class WebProcessorTest extends TestCase
     public function it_returns_item_unchanged_when_array_has_no_matching_keys(): void
     {
         $item = new LogEntry(LogLevel::Info, 'msg', new DateTimeImmutable(), ['a' => 1]);
-        $result = (new WebProcessor([]))->process($item);
+        $result = new WebProcessor([])->process($item);
 
         $this->assertSame($item, $result);
     }
@@ -241,7 +241,7 @@ final class WebProcessorTest extends TestCase
     public function it_returns_item_unchanged_when_null(): void
     {
         $item = new LogEntry(LogLevel::Info, 'msg', new DateTimeImmutable(), ['a' => 1]);
-        $result = (new WebProcessor())->process($item);
+        $result = new WebProcessor()->process($item);
 
         $this->assertSame($item, $result);
     }

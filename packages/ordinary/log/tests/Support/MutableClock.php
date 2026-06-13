@@ -21,7 +21,7 @@ final class MutableClock implements ClockInterface
      */
     public function advance(int $seconds): void
     {
-        $this->current = $this->current->modify("+{$seconds} seconds");
+        $this->current = $this->current->modify(\sprintf('+%d seconds', $seconds));
     }
 
     public function now(): DateTimeImmutable

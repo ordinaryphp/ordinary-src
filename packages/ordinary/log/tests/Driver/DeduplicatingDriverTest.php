@@ -78,6 +78,7 @@ final class DeduplicatingDriverTest extends TestCase
         $clock = $this->makeClock();
         $driver = new DeduplicatingDriver($inner, windowSeconds: 60, clock: $clock);
         $driver->handleLog($this->makeItem('msg'));
+
         $clock->advance(1);
         $driver->handleLog($this->makeItem('msg'));
         $clock->advance(1);
@@ -90,9 +91,7 @@ final class DeduplicatingDriverTest extends TestCase
         $times = $received[1]->context['dedup_times'];
         $this->assertIsArray($times);
         $this->assertCount(2, $times);
-        foreach ($times as $time) {
-            $this->assertInstanceOf(DateTimeImmutable::class, $time);
-        }
+        $this->assertContainsOnlyInstancesOf(DateTimeImmutable::class, $times);
     }
 
     #[Test]
@@ -252,6 +251,7 @@ final class DeduplicatingDriverTest extends TestCase
         $clock = $this->makeClock();
         $driver = new DeduplicatingDriver($inner, windowSeconds: 60, clock: $clock);
         $driver->handleLog($this->makeItem('msg'));
+
         $clock->advance(10);
         $driver->handleLog($this->makeItem('msg')); // duplicate accumulates
 

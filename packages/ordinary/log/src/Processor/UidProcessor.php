@@ -28,9 +28,9 @@ use Ordinary\Log\LogProcessorInterface;
  * produces a lowercase hex string of the requested character length (default 7);
  * `$length` is ignored when a custom `$generator` is supplied.
  */
-final class UidProcessor implements LogProcessorInterface
+final readonly class UidProcessor implements LogProcessorInterface
 {
-    private readonly string $uid;
+    private string $uid;
 
     /**
      * @param string $contextKey Key under which the UID is stored in context.
@@ -41,11 +41,11 @@ final class UidProcessor implements LogProcessorInterface
      * @throws \UnexpectedValueException When $generator returns an empty string.
      */
     public function __construct(
-        private readonly string $contextKey = 'uid',
-        private readonly int $length = 7,
+        private string $contextKey = 'uid',
+        private int $length = 7,
         ?\Closure $generator = null,
     ) {
-        if ($generator !== null) {
+        if ($generator instanceof \Closure) {
             $uid = $generator();
 
             if ($uid === '') {

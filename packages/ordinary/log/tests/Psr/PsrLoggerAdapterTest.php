@@ -82,19 +82,17 @@ final class PsrLoggerAdapterTest extends TestCase
         }
     }
 
-    /** @return array<string, array{non-empty-string, non-empty-string}> */
-    public static function psrLevelToMethodProvider(): array
+    /** @return \Iterator<string, array{non-empty-string, non-empty-string}> */
+    public static function psrLevelToMethodProvider(): \Iterator
     {
-        return [
-            'emergency' => [PsrLogLevel::EMERGENCY, 'emergency'],
-            'alert'     => [PsrLogLevel::ALERT,     'alert'],
-            'critical'  => [PsrLogLevel::CRITICAL,  'critical'],
-            'error'     => [PsrLogLevel::ERROR,      'error'],
-            'warning'   => [PsrLogLevel::WARNING,    'warning'],
-            'notice'    => [PsrLogLevel::NOTICE,     'notice'],
-            'info'      => [PsrLogLevel::INFO,       'info'],
-            'debug'     => [PsrLogLevel::DEBUG,      'debug'],
-        ];
+        yield 'emergency' => [PsrLogLevel::EMERGENCY, 'emergency'];
+        yield 'alert' => [PsrLogLevel::ALERT,     'alert'];
+        yield 'critical' => [PsrLogLevel::CRITICAL,  'critical'];
+        yield 'error' => [PsrLogLevel::ERROR,      'error'];
+        yield 'warning' => [PsrLogLevel::WARNING,    'warning'];
+        yield 'notice' => [PsrLogLevel::NOTICE,     'notice'];
+        yield 'info' => [PsrLogLevel::INFO,       'info'];
+        yield 'debug' => [PsrLogLevel::DEBUG,      'debug'];
     }
 
     /**

@@ -7,6 +7,7 @@ namespace Ordinary\Log\Processor;
 use Ordinary\Log\ImmutableLogEntryInterface;
 use Ordinary\Log\LogEntry;
 use Ordinary\Log\LogEntryInterface;
+use Ordinary\Log\Logger;
 use Ordinary\Log\LogProcessorInterface;
 
 /**
@@ -50,7 +51,7 @@ final readonly class IntrospectionProcessor implements LogProcessorInterface
     public function __construct(array $skipNamespaces = [])
     {
         $this->skipNamespaces = \array_merge(
-            ['Ordinary\\Log\\Processor\\', 'Ordinary\\Log\\Logger'],
+            ['Ordinary\\Log\\Processor\\', Logger::class],
             $skipNamespaces,
         );
     }
@@ -126,12 +127,6 @@ final readonly class IntrospectionProcessor implements LogProcessorInterface
 
     private function isSkipped(string $class): bool
     {
-        foreach ($this->skipNamespaces as $prefix) {
-            if (\str_starts_with($class, $prefix)) {
-                return true;
-            }
-        }
-
-        return false;
+        return \array_any($this->skipNamespaces, fn(string $prefix): bool => \str_starts_with($class, $prefix));
     }
 }

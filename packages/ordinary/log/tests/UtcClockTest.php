@@ -26,20 +26,20 @@ final class UtcClockTest extends TestCase
     public function now_returns_datetime_immutable(): void
     {
         // @phpstan-ignore method.alreadyNarrowedType
-        $this->assertInstanceOf(DateTimeImmutable::class, (new UtcClock())->now());
+        $this->assertInstanceOf(DateTimeImmutable::class, new UtcClock()->now());
     }
 
     #[Test]
     public function now_returns_utc_timezone(): void
     {
-        $this->assertSame('UTC', (new UtcClock())->now()->getTimezone()->getName());
+        $this->assertSame('UTC', new UtcClock()->now()->getTimezone()->getName());
     }
 
     #[Test]
     public function now_returns_current_time(): void
     {
         $before = new DateTimeImmutable('now', new DateTimeZone('UTC'));
-        $now = (new UtcClock())->now();
+        $now = new UtcClock()->now();
         $after = new DateTimeImmutable('now', new DateTimeZone('UTC'));
 
         $this->assertGreaterThanOrEqual($before, $now);

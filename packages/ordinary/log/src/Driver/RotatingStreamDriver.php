@@ -33,7 +33,7 @@ final class RotatingStreamDriver implements SynchronousDriverInterface
     private ?string $currentDate = null;
 
     /** @var resource|null */
-    private $stream = null;
+    private $stream;
 
     /**
      * @param string $pathPattern File path containing `{date}` as a placeholder.
@@ -75,9 +75,7 @@ final class RotatingStreamDriver implements SynchronousDriverInterface
         }
 
         $path = \str_replace('{date}', $date, $this->pathPattern);
-        \set_error_handler(static function (): bool {
-            return true;
-        });
+        \set_error_handler(static fn(): bool => true);
         $stream = \fopen($path, 'a');
         \restore_error_handler();
 

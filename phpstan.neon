@@ -13,6 +13,18 @@ parameters:
         -
             message: '#Dynamic call to static method#'
             path: packages/*/tests/*
+        -
+            # PSR-11 Container::get() returns mixed; typed assertions on resolved services are expected.
+            identifier: method.alreadyNarrowedType
+            path: packages/*/tests/*
+        -
+            # PSR-11 Container::get() returns mixed; property access on resolved services is expected.
+            identifier: property.nonObject
+            path: packages/*/tests/*
+        -
+            # PSR-11 Container::get() returns mixed; passing resolved services to typed constructors is expected.
+            identifier: argument.type
+            path: packages/*/tests/*
     strictRules:
         allRules: true
         disallowedLooseComparison: true

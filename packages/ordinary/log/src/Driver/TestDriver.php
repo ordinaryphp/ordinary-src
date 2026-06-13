@@ -44,25 +44,13 @@ final class TestDriver implements LogDriverInterface
     /** Returns true if any item at the given level has been recorded. */
     public function hasRecordAtLevel(LogLevel $level): bool
     {
-        foreach ($this->records as $record) {
-            if ($record->level === $level) {
-                return true;
-            }
-        }
-
-        return false;
+        return \array_any($this->records, fn($record): bool => $record->level === $level);
     }
 
     /** Returns true if an item matching both level and exact message has been recorded. */
     public function hasRecord(LogLevel $level, string $message): bool
     {
-        foreach ($this->records as $record) {
-            if ($record->level === $level && $record->message === $message) {
-                return true;
-            }
-        }
-
-        return false;
+        return \array_any($this->records, fn($record): bool => $record->level === $level && $record->message === $message);
     }
 
     /**
@@ -72,7 +60,7 @@ final class TestDriver implements LogDriverInterface
     public function hasRecordThatContains(string $needle, ?LogLevel $level = null): bool
     {
         foreach ($this->records as $record) {
-            if ($level !== null && $record->level !== $level) {
+            if ($level instanceof LogLevel && $record->level !== $level) {
                 continue;
             }
 

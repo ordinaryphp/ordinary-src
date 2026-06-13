@@ -149,7 +149,7 @@ final class LogEntryTest extends TestCase
     #[Test]
     public function reserved_constants_use_psr3_compatible_names(): void
     {
-        $constants = (new \ReflectionClass(LogEntryInterface::class))->getConstants();
+        $constants = new \ReflectionClass(LogEntryInterface::class)->getConstants();
         $this->assertSame('date', $constants['RESERVED_DATE']);
         $this->assertSame('level', $constants['RESERVED_LEVEL']);
         $this->assertSame('exception', $constants['RESERVED_EXCEPTION']);

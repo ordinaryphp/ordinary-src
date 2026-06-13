@@ -6,31 +6,64 @@
   "repositories": [
     {
       "type": "path",
+      "url": "packages/ordinary/config"
+    },
+    {
+      "type": "path",
+      "url": "packages/ordinary/container"
+    },
+    {
+      "type": "path",
       "url": "packages/ordinary/log"
     },
     {
       "type": "path",
+      "url": "packages/ordinary/error"
+    },
+    {
+      "type": "path",
       "url": "packages/ordinary/uid"
+    },
+    {
+      "type": "path",
+      "url": "packages/ordinary/router"
+    },
+    {
+      "type": "path",
+      "url": "packages/ordinary/cli"
     }
   ],
   "require": {
     "php": "^8.5",
+    "ordinary/cli": "@dev",
+    "ordinary/config": "@dev",
+    "ordinary/container": "@dev",
+    "ordinary/error": "@dev",
     "ordinary/log": "@dev",
-    "ordinary/uid": "@dev"
+    "ordinary/uid": "@dev",
+    "ordinary/router": "@dev"
   },
   "require-dev": {
     "ext-xdebug": "*",
-    "phpunit/phpunit": "^13.0",
     "friendsofphp/php-cs-fixer": "^3.94",
+    "nyholm/psr7": "^1.8",
     "phpstan/phpstan": "^2.1",
     "phpstan/phpstan-phpunit": "^2.0",
     "phpstan/phpstan-strict-rules": "^2.0",
+    "phpunit/phpunit": "^13.0",
+    "psr/cache": "^3.0",
+    "psr/simple-cache": "^3.0",
     "rector/rector": "^2.3"
   },
   "autoload-dev": {
     "psr-4": {
+      "Ordinary\\Config\\Tests\\": "packages/ordinary/config/tests/",
+      "Ordinary\\Container\\Tests\\": "packages/ordinary/container/tests/",
+      "Ordinary\\Error\\Tests\\": "packages/ordinary/error/tests/",
       "Ordinary\\Log\\Tests\\": "packages/ordinary/log/tests/",
-      "Ordinary\\Uid\\Tests\\": "packages/ordinary/uid/tests/"
+      "Ordinary\\Uid\\Tests\\": "packages/ordinary/uid/tests/",
+      "Ordinary\\Cli\\Tests\\": "packages/ordinary/cli/tests/",
+      "Ordinary\\Router\\Tests\\": "packages/ordinary/router/tests/"
     }
   },
   "config": {

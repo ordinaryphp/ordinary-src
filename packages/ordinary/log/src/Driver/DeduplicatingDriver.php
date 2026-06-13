@@ -46,7 +46,6 @@ final class DeduplicatingDriver implements LogDriverInterface, FlushableInterfac
     private array $pending = [];
 
     /**
-     * @param LogDriverInterface $inner
      * @param int $windowSeconds
      *                           Seconds a fingerprint is held. Expiry triggers a dedup-summary
      *                           dispatch on the next handleLog call.
@@ -67,7 +66,7 @@ final class DeduplicatingDriver implements LogDriverInterface, FlushableInterfac
     {
         $this->evict();
 
-        $key = $this->fingerprint !== null
+        $key = $this->fingerprint instanceof \Closure
             ? ($this->fingerprint)($logItem)
             : $logItem->level->name . ':' . $logItem->message;
 
@@ -121,7 +120,7 @@ final class DeduplicatingDriver implements LogDriverInterface, FlushableInterfac
             return;
         }
 
-        $cutoff = $this->clock->now()->modify("-{$this->windowSeconds} seconds");
+        $cutoff = $this->clock->now()->modify(\sprintf('-%d seconds', $this->windowSeconds));
 
         foreach (\array_keys($this->pending) as $key) {
             $entry = $this->pending[$key];

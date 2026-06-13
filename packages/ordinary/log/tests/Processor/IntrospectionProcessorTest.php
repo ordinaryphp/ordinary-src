@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Ordinary\Log\Tests\Processor;
 
 use DateTimeImmutable;
+use Ordinary\Log\LogDriverInterface;
 use Ordinary\Log\LogEntry;
+use Ordinary\Log\LogEntryInterface;
 use Ordinary\Log\Logger;
 use Ordinary\Log\LogLevel;
 use Ordinary\Log\Processor\IntrospectionProcessor;
@@ -82,10 +84,10 @@ final class IntrospectionProcessorTest extends TestCase
     #[Test]
     public function it_records_correct_call_site_when_called_from_logger(): void
     {
-        $driver = new class implements \Ordinary\Log\LogDriverInterface {
-            public ?\Ordinary\Log\LogEntryInterface $lastItem = null;
+        $driver = new class implements LogDriverInterface {
+            public ?LogEntryInterface $lastItem = null;
 
-            public function handleLog(\Ordinary\Log\LogEntryInterface $logItem): void
+            public function handleLog(LogEntryInterface $logItem): void
             {
                 $this->lastItem = $logItem;
             }
@@ -98,7 +100,7 @@ final class IntrospectionProcessorTest extends TestCase
         $logger->info('test'); // call site is THIS line
 
         $captured = $driver->lastItem;
-        $this->assertNotNull($captured);
+        $this->assertInstanceOf(LogEntryInterface::class, $captured);
         $this->assertArrayHasKey('log.file', $captured->context);
         $file = $captured->context['log.file'];
         $this->assertIsString($file);

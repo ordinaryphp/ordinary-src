@@ -98,8 +98,11 @@ final class CallableProcessorTest extends TestCase
             public function __construct(private readonly DateTimeImmutable $dt) {}
 
             public LogLevel $level { get => LogLevel::Warning; }
+
             public string $message { get => 'stubbed'; }
+
             public \DateTimeInterface $dateTime { get => $this->dt; }
+
             /** @var array<string, mixed> */
             public array $context { get => ['x' => 1]; }
         };

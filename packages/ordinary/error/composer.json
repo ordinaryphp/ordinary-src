@@ -1,0 +1,41 @@
+{
+  "name": "ordinary/error",
+  "description": "PHP error and exception handler management for OrdinaryPHP",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "OrdinaryPHP Contributors"
+    }
+  ],
+  "require": {
+    "php": "^8.5",
+    "psr/log": "^3.0"
+  },
+  "require-dev": {
+    "phpstan/phpstan": "^2.1",
+    "phpstan/phpstan-phpunit": "^2.0",
+    "phpstan/phpstan-strict-rules": "^2.0",
+    "phpunit/phpunit": "^13.0"
+  },
+  "suggest": {
+    "revolt/event-loop": "Required for async handler dispatch via ErrorHandler/ExceptionHandler's $dispatcher parameter"
+  },
+  "autoload": {
+    "psr-4": {
+      "Ordinary\\Error\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Ordinary\\Error\\Tests\\": "tests/"
+    }
+  },
+  "config": {
+    "sort-packages": true,
+    "optimize-autoloader": true,
+    "preferred-install": "dist"
+  },
+  "minimum-stability": "stable",
+  "prefer-stable": true
+}

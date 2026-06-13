@@ -1,0 +1,40 @@
+{
+  "name": "ordinary/cli",
+  "description": "PHP 8.5 CLI argument parser and subcommand router: declare options and commands, receive typed ParsedInput, zero framework dependencies.",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "OrdinaryPHP Contributors"
+    }
+  ],
+  "require": {
+    "php": "^8.5"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^13.0",
+    "phpstan/phpstan": "^2.1",
+    "phpstan/phpstan-strict-rules": "^2.0",
+    "phpstan/phpstan-phpunit": "^2.0"
+  },
+  "suggest": {
+    "psr/container": "PSR-11 container for DI-resolved handler instances in AttributeCommandLoader"
+  },
+  "autoload": {
+    "psr-4": {
+      "Ordinary\\Cli\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Ordinary\\Cli\\Tests\\": "tests/"
+    }
+  },
+  "config": {
+    "sort-packages": true,
+    "optimize-autoloader": true,
+    "preferred-install": "dist"
+  },
+  "minimum-stability": "stable",
+  "prefer-stable": true
+}

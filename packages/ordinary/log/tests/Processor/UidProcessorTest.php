@@ -61,10 +61,13 @@ final class UidProcessorTest extends TestCase
         $this->assertSame($processor->getUid(), $result->context['uid']);
     }
 
-    /** @return array<string, array{int}> */
-    public static function lengthProvider(): array
+    /** @return \Iterator<string, array{int}> */
+    public static function lengthProvider(): \Iterator
     {
-        return ['length 1' => [1], 'length 7' => [7], 'length 14' => [14], 'length 32' => [32]];
+        yield 'length 1' => [1];
+        yield 'length 7' => [7];
+        yield 'length 14' => [14];
+        yield 'length 32' => [32];
     }
 
     #[Test]

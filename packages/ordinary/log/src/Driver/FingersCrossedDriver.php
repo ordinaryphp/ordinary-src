@@ -36,6 +36,7 @@ final class FingersCrossedDriver implements LogDriverInterface, FlushableInterfa
 {
     /** @var list<LogEntryInterface> */
     private array $buffer = [];
+
     private bool $activated = false;
 
     /**

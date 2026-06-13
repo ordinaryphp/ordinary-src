@@ -444,7 +444,7 @@ final class LoggerTest extends TestCase
             $capturedItem = $item;
         });
 
-        $logger = new Logger(clock: $clock, onFailure: new NoOpFailureHandler());
+        $logger = new Logger(onFailure: new NoOpFailureHandler(), clock: $clock);
         $logger->add($driver);
         $logger->error('timed event');
 
