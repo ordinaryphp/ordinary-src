@@ -143,7 +143,12 @@ jobs:
       matrix:
         php: ['8.5']
         package:
+          - ordinary/cli
+          - ordinary/config
+          - ordinary/container
+          - ordinary/error
           - ordinary/log
+          - ordinary/router
           - ordinary/uid
     steps:
       - uses: actions/checkout@v6

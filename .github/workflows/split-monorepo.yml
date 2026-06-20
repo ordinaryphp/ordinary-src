@@ -15,8 +15,18 @@ jobs:
       fail-fast: false
       matrix:
         package:
+          - local_path: 'packages/ordinary/cli'
+            split_repository: 'cli'
+          - local_path: 'packages/ordinary/config'
+            split_repository: 'config'
+          - local_path: 'packages/ordinary/container'
+            split_repository: 'container'
+          - local_path: 'packages/ordinary/error'
+            split_repository: 'error'
           - local_path: 'packages/ordinary/log'
             split_repository: 'log'
+          - local_path: 'packages/ordinary/router'
+            split_repository: 'router'
           - local_path: 'packages/ordinary/uid'
             split_repository: 'uid'
     steps:
@@ -50,7 +60,28 @@ jobs:
           branch: main
         env:
           PAT: ${{ secrets.SPLIT_REPOSITORY_TOKEN }}
-          GTIHUB_TOKEN: ${{ secrets.SPLIT_REPOSITORY_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.SPLIT_REPOSITORY_TOKEN }}
+
+      - name: Inject Static Docs into Split Repo
+        env:
+          GITHUB_TOKEN: ${{ secrets.SPLIT_REPOSITORY_TOKEN }}
+        run: |
+          REPO_DIR="/tmp/static-docs-${{ matrix.package.split_repository }}"
+          gh repo clone ordinaryphp/${{ matrix.package.split_repository }} "$REPO_DIR"
+          cd "$REPO_DIR"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          cp "$GITHUB_WORKSPACE/LICENSE" .
+          cp "$GITHUB_WORKSPACE/CONTRIBUTING.md" .
+          cp "$GITHUB_WORKSPACE/SECURITY.md" .
+
+          git add LICENSE CONTRIBUTING.md SECURITY.md
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: sync static docs from monorepo"
+            git push origin main
+          fi
 
       - name: Create Pull Request in Split Repo
         if: steps.extract_tag.outputs.bump != 'none'
