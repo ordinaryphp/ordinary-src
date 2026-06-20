@@ -12,7 +12,15 @@ This is the main monorepo for OrdinaryPHP, a modern PHP micro-framework.
 
 This monorepo contains multiple packages that are published to Packagist:
 
-- [ordinary/uid](packages/ordinary/uid) - Universal Unique Identifier (OUID) implementation
+| Package | Description |
+|---------|-------------|
+| [ordinary/cli](packages/ordinary/cli) | CLI argument parser and subcommand router with typed parsed results and auto-generated help text |
+| [ordinary/config](packages/ordinary/config) | Flat key/value configuration management with layered and pipeline resolution |
+| [ordinary/container](packages/ordinary/container) | Dependency injection container with native lazy objects, autowiring, contextual bindings, and PSR-11 compliance |
+| [ordinary/error](packages/ordinary/error) | PHP error and exception handler management |
+| [ordinary/log](packages/ordinary/log) | Structured PSR-3 compatible logging with pluggable drivers and formatters |
+| [ordinary/router](packages/ordinary/router) | HTTP router with a global parameter registry, named routes, URL generation, and attribute-based route discovery |
+| [ordinary/uid](packages/ordinary/uid) | Time-based, namespaced, sortable unique identifier (OUID) implementation |
 
 ## Development
 
