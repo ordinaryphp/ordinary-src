@@ -20,7 +20,7 @@ final class Psr6CacheTest extends TestCase
     {
         $cache = new Psr6Cache(new ArrayCachePool());
 
-        $this->assertNull($cache->load());
+        $this->assertNotInstanceOf(CompiledRoutes::class, $cache->load());
     }
 
     #[Test]
@@ -52,7 +52,7 @@ final class Psr6CacheTest extends TestCase
         $router->compile(cache: $cache);
         $cache->invalidate();
 
-        $this->assertNull($cache->load());
+        $this->assertNotInstanceOf(CompiledRoutes::class, $cache->load());
     }
 
     #[Test]
@@ -61,11 +61,12 @@ final class Psr6CacheTest extends TestCase
         $pool = new ArrayCachePool();
         $item = $pool->getItem('ordinary_router_compiled');
         $item->set('not-compiled-routes');
+
         $pool->save($item);
 
         $cache = new Psr6Cache($pool);
 
-        $this->assertNull($cache->load());
+        $this->assertNotInstanceOf(CompiledRoutes::class, $cache->load());
     }
 
     #[Test]

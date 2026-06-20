@@ -53,7 +53,7 @@ final class ArrayCachePool implements CacheItemPoolInterface
     /**
      * @param string[] $keys
      *
-     * @return iterable<string, \Psr\Cache\CacheItemInterface>
+     * @return iterable<string, CacheItemInterface>
      */
     public function getItems(array $keys = []): iterable
     {

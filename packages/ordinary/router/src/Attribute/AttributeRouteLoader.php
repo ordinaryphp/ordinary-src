@@ -42,9 +42,11 @@ final readonly class AttributeRouteLoader
             if (!$file instanceof \SplFileInfo) {
                 continue;
             }
+
             if ($file->getExtension() !== 'php') {
                 continue;
             }
+
             $realPath = $file->getRealPath();
 
             if ($realPath === false) {

@@ -8,6 +8,7 @@ use Ordinary\Router\Exception\InvalidArgumentException;
 use Ordinary\Router\MatchStatus;
 use Ordinary\Router\Param\ParamBuilder;
 use Ordinary\Router\Router;
+use Ordinary\Router\Tests\Fixtures\EmptyEnum;
 use Ordinary\Router\Tests\Fixtures\ItemStatus;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -148,7 +149,7 @@ final class ParamBuilderTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('no cases');
 
-        $router->param('empty')->enum(\Ordinary\Router\Tests\Fixtures\EmptyEnum::class);
+        $router->param('empty')->enum(EmptyEnum::class);
     }
 
     #[Test]

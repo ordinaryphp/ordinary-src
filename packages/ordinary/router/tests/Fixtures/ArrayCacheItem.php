@@ -11,15 +11,7 @@ use Psr\Cache\CacheItemInterface;
  */
 final class ArrayCacheItem implements CacheItemInterface
 {
-    private mixed $value;
-
-    public function __construct(
-        private readonly string $key,
-        mixed $value,
-        private readonly bool $hit,
-    ) {
-        $this->value = $value;
-    }
+    public function __construct(private readonly string $key, private mixed $value, private readonly bool $hit) {}
 
     public function getKey(): string
     {

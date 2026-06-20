@@ -18,7 +18,7 @@ final class NullCacheTest extends TestCase
     {
         $cache = new NullCache();
 
-        $this->assertNull($cache->load());
+        $this->assertNotInstanceOf(CompiledRoutes::class, $cache->load());
     }
 
     #[Test]
@@ -27,7 +27,7 @@ final class NullCacheTest extends TestCase
         $cache = new NullCache();
         $cache->store(new CompiledRoutes([], [], [], [], []));
 
-        $this->assertNull($cache->load());
+        $this->assertNotInstanceOf(CompiledRoutes::class, $cache->load());
     }
 
     #[Test]
@@ -36,6 +36,6 @@ final class NullCacheTest extends TestCase
         $cache = new NullCache();
         $cache->invalidate();
 
-        $this->assertNull($cache->load());
+        $this->assertNotInstanceOf(CompiledRoutes::class, $cache->load());
     }
 }

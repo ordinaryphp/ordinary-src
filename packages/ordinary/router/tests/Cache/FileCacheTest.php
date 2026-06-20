@@ -63,6 +63,7 @@ final class FileCacheTest extends TestCase
 
         // Compile manually to get the CompiledRoutes
         $router->compile();
+
         $cache = new FileCache($this->cacheFile);
         $router->compile(cache: $cache); // warms the cache
 
