@@ -36,3 +36,4 @@ clover.xml
 # Build artifacts
 build/
 dist/
+/.mcp.json
