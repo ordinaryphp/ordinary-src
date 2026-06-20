@@ -1,4 +1,4 @@
-.PHONY: help install test cs-fix cs-check stan psalm rector phpmd qa fix clean docker-shell
+.PHONY: help install test test-fast cs-fix cs-check stan rector rector-check qa fix clean docker-shell
 
 help: ## Show this help message
 	@echo 'Usage: make [target]'
@@ -9,39 +9,39 @@ help: ## Show this help message
 install: ## Install dependencies
 	composer install
 
-test: ## Run tests
+test: ## Run tests with coverage report
 	vendor/bin/phpunit --testdox --coverage-text --coverage-html .coverage
 
-cs-fix: ## Fix code style issues
+test-fast: ## Run tests without coverage (faster — great for TDD cycles)
+	XDEBUG_MODE=off vendor/bin/phpunit --testdox
+
+cs-fix: ## Auto-fix code style (php-cs-fixer)
 	vendor/bin/php-cs-fixer fix
 
-cs-check: ## Check code style
+cs-check: ## Check code style — exits non-zero if fixes are needed
 	vendor/bin/php-cs-fixer check
 
-stan: ## Run PHPStan static analysis
+stan: ## Run PHPStan static analysis (level max)
 	vendor/bin/phpstan analyse --memory-limit=-1
 
-psalm: ## Run Psalm static analysis
-	vendor/bin/psalm
-
-rector: ## Run Rector refactoring
+rector: ## Apply Rector modernizations
 	vendor/bin/rector process
 
-rector-check: ## Check Rector suggestions (dry run)
+rector-check: ## Rector dry-run — exits non-zero if changes are needed
 	vendor/bin/rector process --dry-run
 
-phpmd: ## Run PHP Mess Detector
-	vendor/bin/phpmd packages text phpmd.xml
+qa: cs-check rector-check stan test ## Run full quality gate (style + rector + analysis + tests)
 
-qa: cs-check stan psalm phpmd test ## Run all quality checks
+fix: rector cs-fix ## Auto-fix: apply Rector then normalize code style
 
-fix: cs-fix rector ## Auto-fix code issues
-
-clean: ## Clean build artifacts
+clean: ## Remove all vendor dirs and caches
 	rm -rf vendor
 	rm -rf .phpunit.cache
-	rm -rf packages/*/vendor
-	find . -name ".phpunit.result.cache" -delete
+	rm -rf .php-cs-fixer.cache
+	rm -rf .coverage
+	rm -rf packages/ordinary/*/vendor
+	rm -rf packages/ordinary/*/.phpunit.cache
+	find . -path ./vendor -prune -o -name ".phpunit.result.cache" -print -delete
 
-docker-shell: ## Start a shell in Docker PHP environment
-	docker compose run --rm php sh
+docker-shell: ## Open an interactive shell in the Docker container
+	./dev.sh

@@ -10,6 +10,10 @@ parameters:
     excludePaths:
         analyse:
             - vendor/**
+    ignoreErrors:
+        -
+            message: '#Dynamic call to static method#'
+            path: tests/*
     strictRules:
         allRules: true
         disallowedLooseComparison: true
@@ -32,7 +36,3 @@ parameters:
     checkUninitializedProperties: true
     checkDynamicProperties: true
     reportAlwaysTrueInLastCondition: true
-    ignoreErrors:
-        -
-            message: '#Dynamic call to static method#'
-            path: tests/*

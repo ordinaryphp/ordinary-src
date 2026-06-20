@@ -25,6 +25,13 @@ parameters:
             # PSR-11 Container::get() returns mixed; passing resolved services to typed constructors is expected.
             identifier: argument.type
             path: packages/*/tests/*
+        -
+            # CloudWatchDriver depends on aws/aws-sdk-php which is an optional external dependency not required by the monorepo.
+            identifier: class.notFound
+            path: packages/ordinary/log/src/Driver/CloudWatchDriver.php
+        -
+            identifier: class.notFound
+            path: packages/ordinary/log/tests/Driver/CloudWatchDriverTest.php
     strictRules:
         allRules: true
         disallowedLooseComparison: true
