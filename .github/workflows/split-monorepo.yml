@@ -62,27 +62,6 @@ jobs:
           PAT: ${{ secrets.SPLIT_REPOSITORY_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.SPLIT_REPOSITORY_TOKEN }}
 
-      - name: Inject Static Docs into Split Repo
-        env:
-          GITHUB_TOKEN: ${{ secrets.SPLIT_REPOSITORY_TOKEN }}
-        run: |
-          REPO_DIR="/tmp/static-docs-${{ matrix.package.split_repository }}"
-          gh repo clone ordinaryphp/${{ matrix.package.split_repository }} "$REPO_DIR"
-          cd "$REPO_DIR"
-
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-
-          cp "$GITHUB_WORKSPACE/LICENSE" .
-          cp "$GITHUB_WORKSPACE/CONTRIBUTING.md" .
-          cp "$GITHUB_WORKSPACE/SECURITY.md" .
-
-          git add LICENSE CONTRIBUTING.md SECURITY.md
-          if ! git diff --cached --quiet; then
-            git commit -m "chore: sync static docs from monorepo"
-            git push origin main
-          fi
-
       - name: Create Pull Request in Split Repo
         if: steps.extract_tag.outputs.bump != 'none'
         env:
@@ -90,6 +69,11 @@ jobs:
         run: |
           gh repo clone ordinaryphp/${{ matrix.package.split_repository }} /tmp/${{ matrix.package.split_repository }}
           cd /tmp/${{ matrix.package.split_repository }}
+
+          # Wire GITHUB_TOKEN into git so that git push authenticates correctly.
+          git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/ordinaryphp/${{ matrix.package.split_repository }}.git"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
 
           # Create version bump PR
           BRANCH_NAME="version-bump-$(date +%s)"
