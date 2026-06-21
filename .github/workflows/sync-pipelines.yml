@@ -24,7 +24,7 @@ jobs:
         repo: [cli, config, container, error, log, router, uid]
     steps:
       - name: Checkout monorepo
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Check skip configuration
         id: config
@@ -45,7 +45,7 @@ jobs:
       - name: Clone split repository
         if: steps.config.outputs.skip != 'true'
         env:
-          GH_TOKEN: ${{ secrets.SPLIT_REPOSITORY_TOKEN }}
+          GH_TOKEN: ${{ secrets.SYNC_PIPELINES_TOKEN }}
         run: |
           gh repo clone ordinaryphp/${{ matrix.repo }} /tmp/${{ matrix.repo }}
 
@@ -58,7 +58,7 @@ jobs:
       - name: Commit and push
         if: steps.config.outputs.skip != 'true'
         env:
-          GITHUB_TOKEN: ${{ secrets.SPLIT_REPOSITORY_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.SYNC_PIPELINES_TOKEN }}
         run: |
           cd /tmp/${{ matrix.repo }}
 
