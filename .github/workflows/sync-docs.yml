@@ -1,0 +1,119 @@
+name: Sync Static Docs
+
+# Runs on any push to main that touches one of the tracked root-level static
+# doc files, and on manual dispatch. Copies those files into every package
+# directory inside the monorepo, then commits as github-actions[bot].
+#
+# Skip configuration: .github/sync-docs-config.json
+#   skip_packages  — list package names (e.g. "cli") to skip entirely
+#   skip_files     — map of package name → list of filenames to skip for that package
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - CONTRIBUTING.md
+      - SECURITY.md
+      - LICENSE
+  workflow_dispatch:
+
+jobs:
+  sync-docs:
+    name: Sync Static Docs to Packages
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          # Use a PAT so the commit pushed back to main can trigger downstream
+          # workflows (a GITHUB_TOKEN push cannot trigger further workflow runs).
+          token: ${{ secrets.SPLIT_REPOSITORY_TOKEN }}
+
+      - name: Read skip configuration
+        id: config
+        run: |
+          CONFIG_FILE=".github/sync-docs-config.json"
+          if [ ! -f "$CONFIG_FILE" ]; then
+            echo "skip_packages=" >> $GITHUB_OUTPUT
+            echo "raw_config={}" >> $GITHUB_OUTPUT
+          else
+            # Emit the raw JSON for later per-file filtering in the sync step.
+            RAW=$(cat "$CONFIG_FILE")
+            echo "raw_config<<EOF_CONFIG" >> $GITHUB_OUTPUT
+            echo "$RAW" >> $GITHUB_OUTPUT
+            echo "EOF_CONFIG" >> $GITHUB_OUTPUT
+
+            # Build a space-separated list of fully-skipped packages.
+            SKIP_PKGS=$(echo "$RAW" | jq -r '.skip_packages // [] | join(" ")')
+            echo "skip_packages=$SKIP_PKGS" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Sync docs into each package
+        id: sync
+        env:
+          SKIP_PACKAGES: ${{ steps.config.outputs.skip_packages }}
+          RAW_CONFIG: ${{ steps.config.outputs.raw_config }}
+        run: |
+          # The static doc files tracked by this workflow.
+          TRACKED_FILES=("CONTRIBUTING.md" "SECURITY.md" "LICENSE")
+
+          PACKAGES=(cli config container error log router uid)
+
+          CHANGED=0
+
+          for PKG in "${PACKAGES[@]}"; do
+            PKG_DIR="packages/ordinary/$PKG"
+
+            # --- Package-level skip ---
+            if echo " $SKIP_PACKAGES " | grep -q " $PKG "; then
+              echo "Skipping package: $PKG (listed in skip_packages)"
+              continue
+            fi
+
+            # Build the list of files to skip for this package.
+            SKIP_FILES_FOR_PKG=$(echo "$RAW_CONFIG" | jq -r \
+              --arg pkg "$PKG" \
+              '.skip_files[$pkg] // [] | join(" ")')
+
+            for FILE in "${TRACKED_FILES[@]}"; do
+              # --- File-level skip ---
+              if echo " $SKIP_FILES_FOR_PKG " | grep -q " $FILE "; then
+                echo "Skipping $FILE for package $PKG (listed in skip_files)"
+                continue
+              fi
+
+              if [ ! -f "$FILE" ]; then
+                echo "Source file $FILE not found at repo root — skipping"
+                continue
+              fi
+
+              cp "$FILE" "$PKG_DIR/$FILE"
+              echo "Copied $FILE → $PKG_DIR/"
+              CHANGED=1
+            done
+          done
+
+          echo "changed=$CHANGED" >> $GITHUB_OUTPUT
+
+      - name: Commit synced docs
+        if: steps.sync.outputs.changed == '1'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add packages/ordinary/*/CONTRIBUTING.md \
+                  packages/ordinary/*/SECURITY.md \
+                  packages/ordinary/*/LICENSE 2>/dev/null || true
+
+          # Only commit if there are staged changes — guards against edge cases
+          # where the copy produced no diff (e.g. files already in sync).
+          if git diff --cached --quiet; then
+            echo "No staged changes — nothing to commit."
+            exit 0
+          fi
+
+          git commit -m "$(printf 'chore: sync static docs from monorepo (%.7s)\n\nSynced CONTRIBUTING.md, SECURITY.md, and LICENSE into all package directories.\nSource commit: %s' "$GITHUB_SHA" "$GITHUB_SHA")"
+
+          git push

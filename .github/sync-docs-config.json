@@ -1,0 +1,7 @@
+{
+  "_comment": "Configure per-package doc sync overrides. To skip a package entirely, add its name to 'skip_packages'. To skip specific files for a package, add an entry under 'skip_files' keyed by package name.",
+  "skip_packages": [],
+  "skip_files": {
+    "_example": ["LICENSE"]
+  }
+}
