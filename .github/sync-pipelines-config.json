@@ -1,0 +1,4 @@
+{
+  "_comment": "Configure per-repo pipeline sync overrides. Add a split repo name (e.g. \"cli\") to 'skip_repos' to prevent syncing the shared CI pipeline to that repository.",
+  "skip_repos": []
+}

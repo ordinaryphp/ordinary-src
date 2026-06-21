@@ -1,0 +1,80 @@
+name: Sync CI Pipelines
+
+# Runs on any push to main that touches the shared pipeline templates, and on
+# manual dispatch. Copies .github/shared-pipelines/ci.yml into the
+# .github/workflows/ directory of every split repository.
+#
+# Skip configuration: .github/sync-pipelines-config.json
+#   skip_repos  — list of split repo names (e.g. "cli") to skip entirely
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/shared-pipelines/**
+  workflow_dispatch:
+
+jobs:
+  sync-pipelines:
+    name: Sync CI Pipeline — ${{ matrix.repo }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        repo: [cli, config, container, error, log, router, uid]
+    steps:
+      - name: Checkout monorepo
+        uses: actions/checkout@v6
+
+      - name: Check skip configuration
+        id: config
+        run: |
+          CONFIG_FILE=".github/sync-pipelines-config.json"
+          SKIP_REPOS=""
+          if [ -f "$CONFIG_FILE" ]; then
+            SKIP_REPOS=$(jq -r '.skip_repos // [] | join(" ")' "$CONFIG_FILE")
+          fi
+
+          if echo " $SKIP_REPOS " | grep -q " ${{ matrix.repo }} "; then
+            echo "skip=true" >> $GITHUB_OUTPUT
+            echo "Repository ${{ matrix.repo }} is listed in skip_repos — skipping."
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Clone split repository
+        if: steps.config.outputs.skip != 'true'
+        env:
+          GH_TOKEN: ${{ secrets.SPLIT_REPOSITORY_TOKEN }}
+        run: |
+          gh repo clone ordinaryphp/${{ matrix.repo }} /tmp/${{ matrix.repo }}
+
+      - name: Inject CI pipeline file
+        if: steps.config.outputs.skip != 'true'
+        run: |
+          mkdir -p /tmp/${{ matrix.repo }}/.github/workflows
+          cp .github/shared-pipelines/ci.yml /tmp/${{ matrix.repo }}/.github/workflows/ci.yml
+
+      - name: Commit and push
+        if: steps.config.outputs.skip != 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.SPLIT_REPOSITORY_TOKEN }}
+        run: |
+          cd /tmp/${{ matrix.repo }}
+
+          # Authenticate git push via the PAT.
+          git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/ordinaryphp/${{ matrix.repo }}.git"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add .github/workflows/ci.yml
+
+          # Guard against a no-op push when the pipeline is already in sync.
+          if git diff --cached --quiet; then
+            echo "CI pipeline already in sync for ${{ matrix.repo }} — nothing to commit."
+            exit 0
+          fi
+
+          git commit -m "$(printf 'chore: sync CI pipeline from monorepo (%.7s)\n\nSynced .github/workflows/ci.yml from ordinaryphp/ordinary-src.\nSource commit: %s' "$GITHUB_SHA" "$GITHUB_SHA")"
+
+          git push
