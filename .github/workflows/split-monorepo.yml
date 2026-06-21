@@ -30,7 +30,7 @@ jobs:
           - local_path: 'packages/ordinary/uid'
             split_repository: 'uid'
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
@@ -50,7 +50,7 @@ jobs:
           fi
 
       - name: Split Repository
-        uses: symplify/monorepo-split-github-action@main
+        uses: symplify/monorepo-split-github-action@v2.4.5
         with:
           package_directory: ${{ matrix.package.local_path }}
           repository_organization: 'ordinaryphp'
