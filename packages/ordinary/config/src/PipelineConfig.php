@@ -62,7 +62,7 @@ final class PipelineConfig implements Config
             return true;
         }
 
-        return \array_any($this->sources, fn($source) => $source->has($key));
+        return \array_any($this->sources, fn(Config $source): bool => $source->has($key));
     }
 
     public function get(string $key, mixed $default = null): mixed
