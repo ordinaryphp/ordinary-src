@@ -19,6 +19,6 @@ final readonly class IsAny implements LogMatcherInterface
 
     public function matches(LogEntryInterface $logItem): bool
     {
-        return \array_any($this->matchers, fn($matcher) => $matcher->matches($logItem));
+        return \array_any($this->matchers, fn(LogMatcherInterface $matcher): bool => $matcher->matches($logItem));
     }
 }

@@ -44,13 +44,13 @@ final class TestDriver implements LogDriverInterface
     /** Returns true if any item at the given level has been recorded. */
     public function hasRecordAtLevel(LogLevel $level): bool
     {
-        return \array_any($this->records, fn($record): bool => $record->level === $level);
+        return \array_any($this->records, fn(LogEntryInterface $record): bool => $record->level === $level);
     }
 
     /** Returns true if an item matching both level and exact message has been recorded. */
     public function hasRecord(LogLevel $level, string $message): bool
     {
-        return \array_any($this->records, fn($record): bool => $record->level === $level && $record->message === $message);
+        return \array_any($this->records, fn(LogEntryInterface $record): bool => $record->level === $level && $record->message === $message);
     }
 
     /**

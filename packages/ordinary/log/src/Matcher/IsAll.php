@@ -19,6 +19,6 @@ final readonly class IsAll implements LogMatcherInterface
 
     public function matches(LogEntryInterface $logItem): bool
     {
-        return \array_all($this->matchers, fn($matcher) => $matcher->matches($logItem));
+        return \array_all($this->matchers, fn(LogMatcherInterface $matcher): bool => $matcher->matches($logItem));
     }
 }
