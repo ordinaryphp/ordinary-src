@@ -1,4 +1,4 @@
-.PHONY: help install test test-fast cs-fix cs-check stan rector rector-check qa fix clean docker-shell
+.PHONY: help install hooks test test-fast cs-fix cs-check stan rector rector-check qa fix clean docker-shell
 
 help: ## Show this help message
 	@echo 'Usage: make [target]'
@@ -8,6 +8,9 @@ help: ## Show this help message
 
 install: ## Install dependencies
 	composer install
+
+hooks: ## Install git hooks from .githooks/ (run once after cloning)
+	git config core.hooksPath .githooks
 
 test: ## Run tests with coverage report
 	vendor/bin/phpunit --testdox --coverage-text --coverage-html .coverage

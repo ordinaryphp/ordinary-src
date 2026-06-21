@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+# Rejects commits that attribute AI tools as co-authors.
+
+COMMIT_MSG_FILE="$1"
+COMMIT_MSG=$(cat "$COMMIT_MSG_FILE")
+
+# AI co-author email patterns (ERE, matched case-insensitively)
+AI_EMAILS=(
+    'noreply@anthropic\.com'
+    'claude@anthropic\.com'
+    'copilot@github\.com'
+    '[0-9]+\+[Cc]opilot@users\.noreply\.github\.com'
+    'cursor@anysphere\.com'
+    'noreply@openai\.com'
+    'gpt@openai\.com'
+    'gemini@google\.com'
+    'noreply@google\.com'
+)
+
+FOUND=0
+
+# Build a single alternation pattern for efficiency
+AI_EMAIL_PATTERN=$(printf '%s|' "${AI_EMAILS[@]}")
+AI_EMAIL_PATTERN="${AI_EMAIL_PATTERN%|}"
+
+# Flag any Co-Authored-By trailer
+if echo "$COMMIT_MSG" | grep -iEq '^Co-Authored-By:'; then
+    # Check whether the matched line contains an AI email
+    if echo "$COMMIT_MSG" | grep -iE '^Co-Authored-By:' | grep -iEq "<(${AI_EMAIL_PATTERN})>"; then
+        echo "error: AI co-author credit detected (Co-Authored-By trailer)."
+        FOUND=1
+    fi
+fi
+
+# Also catch AI emails appearing outside a formal trailer
+if echo "$COMMIT_MSG" | grep -iEq "(${AI_EMAIL_PATTERN})"; then
+    if ! echo "$COMMIT_MSG" | grep -iE "(${AI_EMAIL_PATTERN})" | grep -iEq '^Co-Authored-By:'; then
+        echo "error: AI co-author email detected in commit message."
+        FOUND=1
+    fi
+fi
+
+if [[ "$FOUND" -eq 1 ]]; then
+    echo "Remove AI attribution from the commit message before committing."
+    exit 1
+fi
+
+exit 0
