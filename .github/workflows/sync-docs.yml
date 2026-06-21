@@ -25,7 +25,7 @@ jobs:
       contents: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           # Use a PAT so the commit pushed back to main can trigger downstream
           # workflows (a GITHUB_TOKEN push cannot trigger further workflow runs).
