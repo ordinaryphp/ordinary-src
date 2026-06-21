@@ -23,6 +23,6 @@ final readonly class IsAll implements ThrowableMatcherInterface
 
     public function matches(\Throwable $throwable): bool
     {
-        return \array_all($this->matchers, fn($matcher) => $matcher->matches($throwable));
+        return \array_all($this->matchers, fn(ThrowableMatcherInterface $matcher): bool => $matcher->matches($throwable));
     }
 }
